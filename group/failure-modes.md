@@ -6,29 +6,18 @@ Liệt kê cách product có thể fail — không phải list features.
 
 ---
 
-## Template
+## Top 3
 
 | # | Trigger | Hậu quả | Mitigation |
 |---|---------|---------|------------|
-| 1 |   |   |   |
-| 2 |   |   |   |
-| 3 |   |   |   |
+| 1 | Hệ thống **hiểu sai tình trạng xe** (ví dụ: đọc sai sensor, hoặc NLP hiểu sai mô tả của user) | Gợi ý hành động sai (ví dụ: tiếp tục đi khi xe sắp hết pin / lỗi phanh) — **user không biết bị sai**, có thể gây nguy hiểm | Confidence score + uncertainty detection. Nếu dưới ngưỡng → fallback: yêu cầu xác nhận thêm (triệu chứng, ảnh, log xe) hoặc đề xuất liên hệ hỗ trợ |
+| 2 | **Dữ liệu dịch vụ không cập nhật** (trạm sạc hết chỗ, cây xăng đóng cửa, gara không hoạt động) | User di chuyển đến địa điểm không khả dụng → mất thời gian, có thể bị kẹt giữa đường | Real-time data sync + verify availability (API / crowdsourcing). Hiển thị trạng thái (open/close, availability). Luôn đưa ≥2 phương án dự phòng |
+| 3 | **Automation hành động sai** (auto đặt lịch sửa chữa / gọi cứu hộ không đúng nhu cầu) | Phát sinh chi phí không cần thiết hoặc delay xử lý vấn đề thực → **đã xảy ra rồi mới biết** | Human-in-the-loop: yêu cầu confirm trước action quan trọng. Delay + undo (30–60s). Hiển thị rõ thông tin trước khi thực hiện (giá, địa điểm, thời gian) |
 
 ---
 
-## Ví dụ
+## Ghi chú
 
-| # | Trigger | Hậu quả | Mitigation |
-|---|---------|---------|------------|
-| 1 | **Chatbot y tế:** bệnh nhân hỏi triệu chứng hiếm, ngoài training data | AI trả lời tự tin nhưng sai — **user không biết bị sai**, tin và tự điều trị | Detect domain ngoài scope → trả lời "Tôi không đủ thông tin, hãy hỏi bác sĩ" thay vì đoán |
-| 2 | **Recommendation engine:** user mua quà cho người khác, pattern khác hẳn lịch sử | AI gợi ý sản phẩm hoàn toàn sai domain, user mất thời gian lọc | Cho user chọn context ("mua cho ai?") trước khi gợi ý. Reset recommendation khi detect mua ngoài pattern |
-| 3 | **AI agent gửi email:** user duyệt nhanh, không đọc kỹ draft AI viết | Email gửi đi có thông tin sai hoặc tone không phù hợp — **đã gửi rồi, không recall được** | Highlight phần AI thay đổi so với template. Delay gửi 30 giây + nút undo |
-
----
-
-## Cách nghĩ failure modes
-
-1. Failure mode nào user THẤY ngay? → ít nguy hiểm (user tự sửa)
-2. Failure mode nào user KHÔNG BIẾT? → nguy hiểm nhất (thiệt hại âm thầm)
-3. Failure mode nào ĐÃ XẢY RA rồi mới biết? → cần prevention, không chỉ detection
-4. Nghĩ từ góc automation/augmentation: automation → failure ngầm nhiều hơn
+- Failure mode #1 là nguy hiểm nhất vì **silent failure** (user tin hệ thống).
+- Failure mode #3 thuộc dạng **irreversible action** → cần prevention mạnh hơn detection.
+- Với hệ thống này, càng nhiều automation → càng phải thiết kế **guardrails + fallback** tốt.
