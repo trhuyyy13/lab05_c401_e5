@@ -4,41 +4,74 @@ Mỗi feature AI chính = 1 bảng. AI trả lời xong → chuyện gì xảy r
 
 ---
 
-## Template
+## Feature 1: Nhận diện sự cố / nhu cầu từ user input
 
-### Feature: [tên feature]
-
-**Trigger:** [user làm gì → AI phản hồi → ...]
+**Trigger:** User nhập mô tả (“xe báo lỗi E12”, “xe sắp hết pin”) hoặc gửi ảnh/log → AI phân tích → xác định vấn đề
 
 | Path | Câu hỏi thiết kế | Mô tả |
 |------|-------------------|-------|
-| **Happy** — AI đúng, tự tin | User thấy gì? Flow kết thúc ra sao? | ___ |
-| **Low-confidence** — AI không chắc | System báo "không chắc" bằng cách nào? User quyết thế nào? | ___ |
-| **Failure** — AI sai | User biết AI sai bằng cách nào? Recover ra sao? | ___ |
-| **Correction** — user sửa | User sửa bằng cách nào? Data đó đi vào đâu? | ___ |
-
-*Lặp lại cho mỗi feature chính.*
+| **Happy** — AI đúng, tự tin | User thấy gì? Flow kết thúc ra sao? | User nhập “xe báo lỗi E12” → AI nhận diện lỗi pin (confidence 92%) → hiển thị lỗi, mô tả, mức độ nguy hiểm → CTA “Tìm trạm sạc gần nhất” |
+| **Low-confidence** — AI không chắc | System báo "không chắc" bằng cách nào? User quyết thế nào? | User nhập “xe hơi yếu” → AI không chắc (confidence 60%) → hiển thị 2 khả năng (pin / động cơ) + câu hỏi làm rõ → user chọn |
+| **Failure** — AI sai | User biết AI sai bằng cách nào? Recover ra sao? | AI hiểu sai lỗi → user thấy mô tả không đúng → bấm “Không đúng” → hệ thống yêu cầu nhập lại hoặc chọn từ danh sách |
+| **Correction** — user sửa | User sửa bằng cách nào? Data đó đi vào đâu? | User chọn lại lỗi đúng → hệ thống log (input + prediction + correction) → dùng để cải thiện model |
 
 ---
 
-## Ví dụ: AI phân loại email
+## Feature 2: Hướng dẫn xử lý theo tình huống
 
-### Feature: Gợi ý nhãn email (Urgent / Action-needed / FYI)
-
-**Trigger:** Email mới đến → AI phân tích subject + sender + nội dung → gợi ý nhãn.
+**Trigger:** Sau khi nhận diện vấn đề → AI đưa ra hướng dẫn từng bước
 
 | Path | Câu hỏi thiết kế | Mô tả |
 |------|-------------------|-------|
-| **Happy** | User thấy gì? Flow kết thúc ra sao? | Email từ sếp, subject "Deadline Friday" → AI gợi ý "Urgent" (confidence 95%) → hiện badge đỏ + lý do "từ sếp, chứa 'deadline'" → user thấy đúng, tiếp tục |
-| **Low-confidence** | System báo bằng cách nào? | Newsletter tiêu đề "Action required" → AI không chắc Action-needed hay FYI (confidence 55%) → hiện 2 nhãn gợi ý + % → user chọn 1 |
-| **Failure** | User biết sai bằng cách nào? | Email khiếu nại viết tiếng lóng → AI gắn "FYI" (confidence 80%) → user đọc inbox, thấy sai → sửa thành "Urgent" |
-| **Correction** | User sửa bằng cách nào? Data đi vào đâu? | User kéo thả email sang nhãn đúng → ghi correction log (sender + pattern + nhãn sửa) → retrain cuối tuần |
+| **Happy** | User thấy gì? Flow kết thúc ra sao? | AI đưa checklist xử lý (dừng xe, kiểm tra, xử lý) → user làm theo → xác nhận “đã xử lý xong” |
+| **Low-confidence** | System báo bằng cách nào? | AI không chắc nguyên nhân → hiển thị nhiều phương án xử lý → user chọn tình huống phù hợp |
+| **Failure** | User biết sai bằng cách nào? | User làm theo nhưng không hiệu quả → bấm “Không hiệu quả” → hệ thống đề xuất phương án khác hoặc gọi hỗ trợ |
+| **Correction** | User sửa bằng cách nào? Data đi vào đâu? | User feedback “hướng dẫn không phù hợp” → hệ thống lưu mismatch → cải thiện recommendation |
 
 ---
 
-## Lưu ý
+## Feature 3: Gợi ý hành động tiếp theo
 
-- Viết **cả 4 path** — nhiều nhóm chỉ nghĩ happy path, bỏ quên 3 cái còn lại
-- Path "Failure" quan trọng nhất: user biết AI sai bằng cách nào? Nếu không biết → nguy hiểm
-- Path "Correction" = nguồn data cho feedback loop — thiết kế sớm, không để sau
-- Mỗi path có câu hỏi thiết kế riêng, không copy-paste
+**Trigger:** Sau khi hiểu vấn đề → AI đề xuất action (trạm sạc, trạm xăng, cứu hộ, bảo dưỡng)
+
+| Path | Câu hỏi thiết kế | Mô tả |
+|------|-------------------|-------|
+| **Happy** | User thấy gì? Flow kết thúc ra sao? | AI đề xuất danh sách trạm gần nhất + ETA → user chọn → mở bản đồ điều hướng |
+| **Low-confidence** | System báo bằng cách nào? | AI không chắc ưu tiên → hiển thị nhiều option (gần nhất, nhanh nhất, ít đông) → user chọn |
+| **Failure** | User biết sai bằng cách nào? | Trạm đề xuất không hoạt động → user đến nơi phát hiện lỗi → quay lại app báo “không khả dụng” |
+| **Correction** | User sửa bằng cách nào? Data đi vào đâu? | User report trạm lỗi → hệ thống cập nhật dữ liệu real-time → cải thiện ranking |
+
+---
+
+## Feature 4: Thực hiện hành động (đặt lịch / gọi dịch vụ)
+
+**Trigger:** User chọn action → AI hỗ trợ thực hiện (đặt lịch sửa xe, gọi cứu hộ…)
+
+| Path | Câu hỏi thiết kế | Mô tả |
+|------|-------------------|-------|
+| **Happy** | User thấy gì? Flow kết thúc ra sao? | AI auto điền thông tin → user xác nhận → nhận lịch hẹn / yêu cầu thành công |
+| **Low-confidence** | System báo bằng cách nào? | AI thiếu thông tin → hỏi thêm (loại dịch vụ, thời gian) → user cung cấp |
+| **Failure** | User biết sai bằng cách nào? | Thông tin đặt sai → user thấy ở màn confirm → chỉnh sửa trước khi submit |
+| **Correction** | User sửa bằng cách nào? Data đi vào đâu? | User chỉnh thông tin → hệ thống lưu preference → dùng cho lần sau |
+
+---
+
+## Feature 5: Chủ động dự đoán & gợi ý (Optional)
+
+**Trigger:** System theo dõi trạng thái xe → dự đoán nhu cầu → đưa ra khuyến nghị
+
+| Path | Câu hỏi thiết kế | Mô tả |
+|------|-------------------|-------|
+| **Happy** | User thấy gì? Flow kết thúc ra sao? | AI phát hiện pin sắp hết → gửi gợi ý → user click → điều hướng đến trạm |
+| **Low-confidence** | System báo bằng cách nào? | AI không chắc nhu cầu → hiển thị suggestion nhẹ → user chọn ignore hoặc accept |
+| **Failure** | User biết sai bằng cách nào? | AI cảnh báo không cần thiết → user dismiss → giảm trust |
+| **Correction** | User sửa bằng cách nào? Data đi vào đâu? | User tắt loại thông báo → hệ thống học preference → cá nhân hóa về sau |
+
+---
+
+## Notes
+
+- Luôn thiết kế đủ 4 paths: Happy / Low-confidence / Failure / Correction  
+- Failure path là quan trọng nhất: user phải nhận ra AI sai  
+- Correction path = nguồn data cho feedback loop  
+- Không chỉ tập trung vào happy path  

@@ -9,19 +9,22 @@
 |   | Value | Trust | Feasibility |
 |---|-------|-------|-------------|
 | **Câu hỏi guide** | User nào? Pain gì? AI giải quyết gì mà cách hiện tại không giải được? | Khi AI sai thì user bị ảnh hưởng thế nào? User biết AI sai bằng cách nào? User sửa bằng cách nào? | Cost bao nhiêu/request? Latency bao lâu? Risk chính là gì? |
-| **Trả lời** | *Nhân viên văn phòng mất 30 phút/ngày phân loại email — AI gợi ý nhãn, giảm còn 5 phút* | *AI gắn sai nhãn → user thấy ngay khi đọc email, sửa 1 click, hệ thống học từ correction* | *~$0.01/email, latency <2s, risk: hallucinate nội dung nhạy cảm nếu dùng external API* |
+| **Trả lời** | Người dùng xe thường mất thời gian tra cứu và gọi hỗ trợ khi xe báo lỗi, sắp hết pin/nhiên liệu hoặc cần dịch vụ. AI giúp nhận diện tình huống, giải thích vấn đề, đề xuất hướng xử lý và hỗ trợ đặt dịch vụ ngay trong ứng dụng. | AI có thể gợi ý sai mức độ nghiêm trọng hoặc hành động chưa phù hợp. User cần thấy gợi ý rõ ràng, có thể sửa nhanh tình trạng thực tế, và luôn có tùy chọn gọi tổng đài/kỹ thuật viên. Với trường hợp rủi ro cao, hệ thống phải chuyển sang con người. | Có thể triển khai bằng cách kết hợp rule engine, knowledge base và AI hội thoại. Latency mục tiêu 1–3 giây, cost thấp nếu chỉ dùng AI ở bước hiểu ngôn ngữ và diễn giải. Risk chính là chẩn đoán sai, dữ liệu xe không đủ chính xác, và khuyến nghị không đồng bộ với quy trình kỹ thuật. |
 
 ---
 
 ## Automation hay augmentation?
 
 ☐ Automation — AI làm thay, user không can thiệp
-☐ Augmentation — AI gợi ý, user quyết định cuối cùng
+
+◼ Augmentation — AI gợi ý, user quyết định cuối cùng
 
 **Justify:** ___
-*VD: Augmentation — user thấy gợi ý và chấp nhận/từ chối, cost of reject = 0*
+Đây nên là bài toán augmentation hơn là automation, vì các tình huống lỗi xe có độ rủi ro cao
+user vẫn cần quyền quyết định ở bước cuối
+AI phù hợp nhất để rút ngắn thời gian hiểu vấn đề và đề xuất next action
+các hành động như đặt lịch, gọi cứu hộ, tới trạm sạc nên để user xác nhận
 
-Gợi ý: nếu AI sai mà user không biết → automation nguy hiểm, cân nhắc augmentation.
 
 ---
 
@@ -29,19 +32,10 @@ Gợi ý: nếu AI sai mà user không biết → automation nguy hiểm, cân n
 
 | # | Câu hỏi | Trả lời |
 |---|---------|---------|
-| 1 | User correction đi vào đâu? | *Mỗi lần user sửa → ghi correction log → dùng để cải thiện model* |
-| 2 | Product thu signal gì để biết tốt lên hay tệ đi? | *Implicit: acceptance rate. Explicit: thumbs down. Correction: user sửa output* |
-| 3 | Data thuộc loại nào? ☐ User-specific · ☐ Domain-specific · ☐ Real-time · ☐ Human-judgment · ☐ Khác: ___ | *User-specific + Real-time — model chung không biết pattern riêng của từng người* |
+| 1 | User correction đi vào đâu? | Mỗi lần user sửa tình huống, đổi hành động hoặc từ chối gợi ý, hệ thống ghi correction log để cải thiện phân loại sự cố, ranking hành động tiếp theo và cập nhật knowledge base/rule xử lý. |
+| 2 | Product thu signal gì để biết tốt lên hay tệ đi? | Implicit: acceptance rate, click-through vào hành động gợi ý, booking rate, rescue rate sau gợi ý, repeat contact rate. Explicit: thumbs down, báo “gợi ý không đúng”. Correction: user sửa loại sự cố hoặc chọn hành động khác. Outcome: sự cố có được giải quyết không, có phải kéo xe/cứu hộ không, có quay lại xưởng sau đó không.|
+| 3 | Data thuộc loại nào? ☐ User-specific · ☐ Domain-specific · ☐ Real-time · ☐ Human-judgment · ☐ Khác: ___ | *User-specific + Real-time + Human-judgment* |
 
-**Có marginal value không?** (Model đã biết cái này chưa? Ai khác cũng thu được data này không?)
+**Có marginal value không?** Có. Model nền không có dữ liệu proprietary về mã lỗi, trạng thái xe real-time, workflow dịch vụ và outcome thực tế. Data này khó đối thủ bên ngoài thu thập đầy đủ, nên tạo lợi thế rõ nhất ở triage, next-best-action, personalization và safety escalation.
 ___
 
----
-
-## Cách dùng
-
-1. Điền Value trước — chưa rõ pain thì chưa điền Trust/Feasibility
-2. Trust: trả lời 4 câu UX (đúng → sai → không chắc → user sửa)
-3. Feasibility: ước lượng cost, không cần chính xác — order of magnitude đủ
-4. Learning signal: nghĩ về vòng lặp dài hạn, không chỉ demo ngày mai
-5. Đánh [?] cho chỗ chưa biết — Canvas là hypothesis, không phải đáp án
