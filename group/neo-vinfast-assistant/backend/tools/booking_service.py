@@ -79,3 +79,35 @@ def book_service(service_type: str) -> str:
         f"⏰ Khung giờ trống: {slots}\n\n"
         f"Vui lòng xác nhận khung giờ để hoàn tất đặt lịch."
     )
+
+
+@tool
+def find_nearest_service_center(location: str = "VinUni") -> str:
+    """Tìm gara VinFast gần nhất dựa trên vị trí (mock tại VinUni).
+
+    Args:
+        location: Vị trí người dùng (mặc định VinUni)
+
+    Returns:
+        Thông tin gara gần nhất và các lựa chọn thay thế.
+    """
+    sorted_centers = sorted(SERVICE_CENTERS, key=lambda item: item["distance_km"])
+    nearest = sorted_centers[0]
+    alternatives = sorted_centers[1:3]
+
+    lines = [
+        "🏁 Gara gần nhất:",
+        f"- Vị trí người dùng (mock): {location}",
+        f"- Gara đề xuất: {nearest['name']}",
+        f"  📍 {nearest['address']} — {nearest['distance_km']} km",
+        f"  ⏰ Slot trống: {' | '.join(nearest['available_slots'])}",
+        "",
+        "Các gara thay thế:",
+    ]
+
+    for center in alternatives:
+        lines.append(f"- {center['name']} — {center['distance_km']} km")
+        lines.append(f"  📍 {center['address']}")
+        lines.append(f"  ⏰ Slot trống: {' | '.join(center['available_slots'])}")
+
+    return "\n".join(lines)

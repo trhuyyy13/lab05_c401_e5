@@ -41,6 +41,8 @@ LOG_DIR = Path(__file__).parent.parent / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_FILE = LOG_DIR / "tool_calls.log"
 
+DEFAULT_LOCATION = "VinUni, Ha Noi"
+
 logger = logging.getLogger("neo.tools")
 if not logger.handlers:
     logger.setLevel(logging.INFO)
@@ -100,7 +102,13 @@ def act_node(state: AgentState) -> dict:
 
     for tc in last_message.tool_calls:
         tool_name = tc.get("name")
-        tool_args = tc.get("args", {})
+        tool_args = dict(tc.get("args", {}) or {})
+        if tool_name == "find_charging_station":
+            if not str(tool_args.get("user_query", "")).strip():
+                tool_args["user_query"] = DEFAULT_LOCATION
+        if tool_name == "find_nearest_service_center":
+            if not str(tool_args.get("location", "")).strip():
+                tool_args["location"] = DEFAULT_LOCATION
         tool = tool_map.get(tool_name)
 
         if tool is None:
