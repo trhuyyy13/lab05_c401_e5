@@ -3,7 +3,7 @@ NEO — VinFast AI Assistant
 FastAPI Backend Server
 
 Chạy: python main.py
-Hoặc: uvicorn main:app --reload --port 8000
+Hoặc: uvicorn main:app --reload --port 8888
 """
 
 from __future__ import annotations
@@ -152,9 +152,9 @@ if __name__ == "__main__":
     print(f"📦 Tools loaded: {len(all_tools)}")
     for t in all_tools:
         print(f"   • {t.name}: {t.description[:60]}...")
-    print(f"\n🌐 Server: http://localhost:8000")
-    print(f"📱 Frontend: http://localhost:8000")
-    print(f"📄 API docs: http://localhost:8000/docs")
+    print(f"\n🌐 Server: http://localhost:8888")
+    print(f"📱 Frontend: http://localhost:8888")
+    print(f"📄 API docs: http://localhost:8888/docs")
     print("=" * 40 + "\n")
     
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run(app, host="0.0.0.0", port=8888, reload=False)
