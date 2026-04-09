@@ -81,13 +81,13 @@ const errorsState = {
 // ═══════════════════════════════════════════════════════════════════
 // DOM Elements
 // ═══════════════════════════════════════════════════════════════════
-const chatMessages   = document.getElementById('chatMessages');
-const chatInput      = document.getElementById('chatInput');
-const chatSendBtn    = document.getElementById('chatSendBtn');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const chatSendBtn = document.getElementById('chatSendBtn');
 const typingIndicator = document.getElementById('typingIndicator');
-const bottomNav      = document.getElementById('bottomNav');
-const headerTitle    = document.querySelector('.header-title');
-const headerBack     = document.getElementById('headerBack');
+const bottomNav = document.getElementById('bottomNav');
+const headerTitle = document.querySelector('.header-title');
+const headerBack = document.getElementById('headerBack');
 const chargeLocationInput = document.getElementById('chargeLocationInput');
 const chargeSearchBtn = document.getElementById('chargeSearchBtn');
 const stationResults = document.getElementById('stationResults');
@@ -104,22 +104,22 @@ function switchTab(tabName) {
 
     flowStack = [];
     bottomNav?.classList.remove('hidden');
-    
+
     // Remove active from all pages
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
+
     // Activate new page + nav
     const page = document.getElementById(`page-${tabName}`);
-    const nav  = document.querySelector(`.nav-item[data-tab="${tabName}"]`) ||
+    const nav = document.querySelector(`.nav-item[data-tab="${tabName}"]`) ||
         (tabName === 'charge-map' ? document.querySelector('.nav-item[data-tab="charge"]') : null);
-    
+
     if (page) page.classList.add('active');
-    if (nav)  nav.classList.add('active');
-    
+    if (nav) nav.classList.add('active');
+
     currentTab = tabName;
     updateHeaderForTab(tabName);
-    
+
     // Auto-focus chat input when switching to support
     if (tabName === 'support') {
         setTimeout(() => chatInput?.focus(), 400);
@@ -272,7 +272,7 @@ async function loadChargingStations(location = 'VinUni') {
 
 function openChargingStations(location = 'VinUni') {
     switchTab('charge');
-    fetch(`${API_BASE}/api/health`).catch(() => {});
+    fetch(`${API_BASE}/api/health`).catch(() => { });
     loadChargingStations(location);
 }
 
@@ -309,14 +309,14 @@ function openStationMap(stationId) {
 function openErrorFlow(errorId) {
     currentErrorId = errorId;
     const flowPageId = `error-${errorId}`;
-    
+
     // Set the default selected error in booking form
     bookingState.selectedErrors = [errorId];
-    
+
     // Update warning cards to show checkbox for current selection
     updateWarningCardStatus();
     updateErrorCheckboxes();
-    
+
     openFlowPage(flowPageId);
 }
 
@@ -449,6 +449,8 @@ function openFeedback(source) {
     feedbackState.source = source || 'self';
     const sourceText = document.getElementById('feedbackSourceText');
     const garageSection = document.getElementById('garageFeedbackSection');
+    const resolvedYes = document.querySelector('input[name="resolved"][value="yes"]');
+    const feedbackDetail = document.getElementById('feedbackDetail');
 
     if (sourceText) {
         sourceText.textContent = feedbackState.source === 'garage'
@@ -460,7 +462,36 @@ function openFeedback(source) {
         garageSection.hidden = feedbackState.source !== 'garage';
     }
 
+    document.querySelectorAll('input[name="helpful"]').forEach((input) => {
+        input.checked = false;
+    });
+
+    if (resolvedYes) {
+        resolvedYes.checked = true;
+    }
+    if (feedbackDetail) {
+        feedbackDetail.hidden = true;
+    }
+
+    document.querySelectorAll('.rating .star').forEach((star) => {
+        star.classList.remove('active');
+    });
+    document.querySelectorAll('.rating').forEach((ratingBlock) => {
+        delete ratingBlock.dataset.score;
+    });
+
     openFlowPage('feedback');
+}
+
+function completeSupport(source = 'self') {
+    openFeedback(source);
+}
+
+function openMapThenFeedback(url, source = 'garage') {
+    if (url) {
+        window.open(url, '_blank', 'noopener');
+    }
+    openFeedback(source);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -475,23 +506,23 @@ function getCurrentTime() {
 function addMessage(content, isUser = false, reasoningSteps = null) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-    
+
     const avatar = isUser ? '👤' : '🤖';
-    
+
     // Parse markdown-lite (bold, line breaks)
     let htmlContent = content
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
-    
+
     let reasoningHTML = '';
     if (reasoningSteps && reasoningSteps.length > 0) {
-        const stepsHTML = reasoningSteps.map(s => 
+        const stepsHTML = reasoningSteps.map(s =>
             `<div class="reasoning-step">
                 <span class="reasoning-step-label">${s.step}:</span>
                 <span>${s.content}</span>
             </div>`
         ).join('');
-        
+
         const uniqueId = 'reasoning-' + Date.now();
         reasoningHTML = `
             <button class="reasoning-toggle" onclick="toggleReasoning('${uniqueId}')">
@@ -502,7 +533,7 @@ function addMessage(content, isUser = false, reasoningSteps = null) {
             </div>
         `;
     }
-    
+
     msgDiv.innerHTML = `
         <div class="msg-avatar">${avatar}</div>
         <div>
@@ -513,7 +544,7 @@ function addMessage(content, isUser = false, reasoningSteps = null) {
             <p class="msg-time">${getCurrentTime()}</p>
         </div>
     `;
-    
+
     chatMessages.appendChild(msgDiv);
     scrollToBottom();
 }
@@ -525,8 +556,8 @@ function toggleReasoning(id) {
         el.classList.toggle('show');
         const btn = el.previousElementSibling;
         if (btn) {
-            btn.textContent = el.classList.contains('show') 
-                ? '🧠 Ẩn suy luận ReAct ▴' 
+            btn.textContent = el.classList.contains('show')
+                ? '🧠 Ẩn suy luận ReAct ▴'
                 : '🧠 Xem suy luận ReAct ▾';
         }
     }
@@ -548,37 +579,37 @@ function scrollToBottom() {
 /** Send a message to the backend */
 async function sendMessage(text) {
     if (!text?.trim() || isProcessing) return;
-    
+
     const message = text.trim();
     isProcessing = true;
-    
+
     // Clear input
     chatInput.value = '';
-    
+
     // Add user message
     addMessage(message, true);
-    
+
     // Show typing
     showTyping(true);
-    
+
     try {
         const response = await fetch(`${API_BASE}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message, session_id: 'default' }),
         });
-        
+
         if (!response.ok) throw new Error('API error');
-        
+
         const data = await response.json();
-        
+
         // Simulate typing delay for more natural feel
         await new Promise(r => setTimeout(r, TYPING_DELAY));
-        
+
         // Hide typing, show response
         showTyping(false);
         addMessage(data.answer, false, data.reasoning_steps);
-        
+
     } catch (error) {
         console.error('Chat error:', error);
         showTyping(false);
@@ -587,7 +618,7 @@ async function sendMessage(text) {
             false
         );
     }
-    
+
     isProcessing = false;
 }
 
@@ -631,9 +662,9 @@ async function loadVehicleStatus() {
     try {
         const res = await fetch(`${API_BASE}/api/vehicle/status`);
         if (!res.ok) return;
-        
+
         const data = await res.json();
-        
+
         // Update UI
         document.getElementById('vehicleName').textContent = data.model;
         document.getElementById('vehiclePlate').textContent = data.plate;
@@ -645,12 +676,12 @@ async function loadVehicleStatus() {
         };
         document.getElementById('odometer').textContent = data.odometer_km.toLocaleString() + ' km';
         document.getElementById('nextService').textContent = data.next_service_km.toLocaleString() + ' km';
-        
+
         // Update battery ring
         const circumference = 2 * Math.PI * 30; // r=30
         const offset = circumference * (1 - data.battery_percent / 100);
         document.getElementById('batteryRing').style.strokeDashoffset = offset;
-        
+
         // Update battery color based on level
         const ring = document.getElementById('batteryRing');
         if (data.battery_percent <= 20) {
@@ -660,14 +691,14 @@ async function loadVehicleStatus() {
         } else {
             ring.style.stroke = 'var(--success)';
         }
-        
+
         // Update badge
         const badge = document.getElementById('vehicleBadge');
         if (data.warnings.length > 0) {
             badge.className = 'vehicle-status-badge badge-warn';
             badge.textContent = `⚠ ${data.warnings.length} cảnh báo`;
         }
-        
+
     } catch (e) {
         console.log('Vehicle API not available, using defaults');
     }
@@ -682,11 +713,13 @@ document.addEventListener('DOMContentLoaded', () => {
     window.switchTab = switchTab;
     window.navigateToSupport = navigateToSupport;
     window.openErrorFlow = openErrorFlow;
+    window.completeSupport = completeSupport;
+    window.openMapThenFeedback = openMapThenFeedback;
 
     // Initialize warning card status display
     updateWarningCardStatus();
     updateErrorCheckboxes();
-    
+
     loadVehicleStatus();
     loadChargingStations('VinUni');
     updateHeaderForTab(currentTab);
@@ -705,16 +738,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bookingForm?.addEventListener('submit', (e) => {
         e.preventDefault();
-        
+
         // Collect selected errors from checkboxes
         const selectedCheckboxes = document.querySelectorAll('input[name="error-selection"]:checked');
         bookingState.selectedErrors = Array.from(selectedCheckboxes).map(cb => cb.value);
-        
+
         // If no errors selected, use current error
         if (bookingState.selectedErrors.length === 0 && currentErrorId) {
             bookingState.selectedErrors = [currentErrorId];
         }
-        
+
         // Mark selected errors as scheduled
         bookingState.selectedErrors.forEach(errorId => {
             if (errorsState[errorId]) {
@@ -722,7 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorsState[errorId].scheduledAt = new Date().toISOString();
             }
         });
-        
+
         bookingState.date = bookingDate?.value || '';
         bookingState.time = bookingTime?.value || '16:30';
         bookingState.active = true;
@@ -730,7 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dateLabel = formatBookingDate(bookingState.date);
         const timeLabel = bookingState.time || '16:30';
         const summary = `${timeLabel} • ${dateLabel} • Ước tính ${bookingState.estimate}`;
-        
+
         // Format list of errors for display
         const errorLabels = bookingState.selectedErrors.map(id => id.toUpperCase()).join(', ');
 
@@ -739,13 +772,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (bookingMeta) bookingMeta.textContent = summary;
         if (bookingDetailTime) bookingDetailTime.textContent = `${timeLabel} • ${dateLabel}`;
-        
+
         const bookingIssues = document.getElementById('bookingIssues');
         if (bookingIssues) bookingIssues.textContent = `Sửa: ${errorLabels}`;
-        
+
         const bookingDetailIssues = document.getElementById('bookingDetailIssues');
         if (bookingDetailIssues) bookingDetailIssues.textContent = errorLabels;
-        
+
         bookingReminder?.classList.remove('hidden');
         updateBookingUI();
         updateWarningCardStatus();
@@ -777,6 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const star = e.target.closest('.star');
             if (!star) return;
             const rating = Number(star.dataset.star || 0);
+            ratingBlock.dataset.score = String(rating);
             ratingBlock.querySelectorAll('.star').forEach((btn) => {
                 const value = Number(btn.dataset.star || 0);
                 btn.classList.toggle('active', value <= rating);
@@ -785,39 +819,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     feedbackSubmit?.addEventListener('click', () => {
-        // Mark selected/scheduled errors as resolved
-        if (feedbackState.source === 'garage') {
-            // For garage feedback, mark the booked errors as resolved
-            bookingState.selectedErrors.forEach(errorId => {
-                if (errorsState[errorId]) {
-                    errorsState[errorId].status = 'resolved';
+        const helpfulChoice = document.querySelector('input[name="helpful"]:checked');
+        const resolvedChoice = document.querySelector('input[name="resolved"]:checked')?.value || 'yes';
+        const userRating = Number(document.getElementById('ratingStars')?.dataset.score || 0);
+
+        if (!helpfulChoice) {
+            alert('Vui lòng chọn Hữu ích hoặc Không hữu ích.');
+            return;
+        }
+
+        if (userRating < 1 || userRating > 5) {
+            alert('Vui lòng đánh giá từ 1 đến 5 sao.');
+            return;
+        }
+
+        const isResolved = resolvedChoice === 'yes';
+
+        if (isResolved) {
+            if (feedbackState.source === 'garage') {
+                bookingState.selectedErrors.forEach(errorId => {
+                    if (errorsState[errorId]) {
+                        errorsState[errorId].status = 'resolved';
+                    }
+                });
+
+                bookingState.selectedErrors.forEach(errorId => {
+                    const warningCard = document.querySelector(`.warning-card[data-error-id="${errorId}"]`);
+                    if (warningCard) {
+                        warningCard.style.animation = 'fadeOut 0.3s ease-out forwards';
+                        setTimeout(() => warningCard.remove(), 300);
+                    }
+                });
+
+                const bookingReminder = document.getElementById('bookingReminder');
+                if (bookingReminder) {
+                    bookingReminder.classList.add('hidden');
                 }
-            });
-            
-            // Remove resolved error cards from warning section
-            bookingState.selectedErrors.forEach(errorId => {
-                const warningCard = document.querySelector(`.warning-card[data-error-id="${errorId}"]`);
-                if (warningCard) {
-                    warningCard.style.animation = 'fadeOut 0.3s ease-out forwards';
-                    setTimeout(() => warningCard.remove(), 300);
-                }
-            });
-            
-            // Hide booking reminder
-            const bookingReminder = document.getElementById('bookingReminder');
-            if (bookingReminder) {
-                bookingReminder.classList.add('hidden');
-            }
-            
-            // Reset booking state
-            bookingState.active = false;
-            bookingState.selectedErrors = [];
-        } else {
-            // For self-repair feedback, mark current error as resolved
-            if (currentErrorId && errorsState[currentErrorId]) {
+
+                bookingState.active = false;
+                bookingState.selectedErrors = [];
+            } else if (currentErrorId && errorsState[currentErrorId]) {
                 errorsState[currentErrorId].status = 'resolved';
-                
-                // Remove resolved warning card
+
                 const warningCard = document.querySelector(`.warning-card[data-error-id="${currentErrorId}"]`);
                 if (warningCard) {
                     warningCard.style.animation = 'fadeOut 0.3s ease-out forwards';
@@ -825,11 +868,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        
+
         currentErrorId = null;
         closeFlowToTab('home');
     });
-    
+
     // Animate battery ring on load
     const ring = document.getElementById('batteryRing');
     if (ring) {
