@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEO — VinFast AI Assistant</title>
+    <meta name="description" content="Trợ lý AI thông minh hỗ trợ người dùng xe VinFast — chẩn đoán sự cố, tìm trạm sạc, đặt lịch dịch vụ">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="phone-frame" id="app">
+
+    <!-- ── Status Bar ──────────────────────────────────────────── -->
+    <div class="status-bar">
+        <span class="status-bar-left">9:41</span>
+        <div class="status-bar-right">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+        </div>
+    </div>
+
+    <!-- ── App Header ──────────────────────────────────────────── -->
+    <header class="app-header">
+        <div class="header-left">
+            <button class="header-back" id="headerBack" aria-label="Go back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span class="header-title">VinFast</span>
+        </div>
+        <span class="header-logo">VinFast</span>
+    </header>
+
+    <!-- ── Page Container ──────────────────────────────────────── -->
+    <div class="page-container">
+
+        <!-- ══ PAGE: TRANG CHỦ ══════════════════════════════════ -->
+        <div class="page active" id="page-home">
+            <!-- Hero -->
+            <div class="home-hero">
+                <p class="home-greeting">Xin chào 👋</p>
+                <h1 class="home-username">Nguyễn Văn A</h1>
+            </div>
+
+            <!-- Vehicle Card -->
+            <div class="vehicle-card fade-in-up">
+                <div class="vehicle-top">
+                    <div>
+                        <h2 class="vehicle-name" id="vehicleName">VinFast VF 8 Plus</h2>
+                        <p class="vehicle-plate" id="vehiclePlate">30A-123.45</p>
+                    </div>
+                    <span class="vehicle-status-badge badge-good" id="vehicleBadge">✓ Tốt</span>
+                </div>
+
+                <!-- Battery -->
+                <div class="battery-section">
+                    <div class="battery-ring">
+                        <svg width="72" height="72" viewBox="0 0 72 72">
+                            <circle class="battery-ring-bg" cx="36" cy="36" r="30"/>
+                            <circle class="battery-ring-fill" id="batteryRing" cx="36" cy="36" r="30"
+                                    stroke-dasharray="188.5" stroke-dashoffset="52.8"/>
+                        </svg>
+                        <div class="battery-percent">
+                            <span class="battery-percent-num" id="batteryNum">72</span>
+                            <span class="battery-percent-label">%</span>
+                        </div>
+                    </div>
+                    <div class="battery-info">
+                        <div>
+                            <span class="battery-range" id="batteryRange">245</span>
+                            <span class="battery-range-unit">km</span>
+                        </div>
+                        <p class="battery-range-label">Quãng đường còn lại</p>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="vehicle-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon speed">🏎️</div>
+                        <div>
+                            <p class="stat-label">Đã đi</p>
+                            <p class="stat-value" id="odometer">15,680 km</p>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon service">🔧</div>
+                        <div>
+                            <p class="stat-label">Bảo dưỡng tiếp</p>
+                            <p class="stat-value" id="nextService">20,000 km</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warnings -->
+            <div class="warning-section fade-in-up" style="animation-delay: 0.1s">
+                <h3 class="section-title">⚠️ Cảnh báo</h3>
+                <div class="warning-card" id="warningCard" onclick="navigateToSupport('Xe báo cảnh báo W03 — sắp đến hạn bảo dưỡng')">
+                    <div class="warning-icon">🔧</div>
+                    <div class="warning-content">
+                        <p class="warning-title">Sắp đến hạn bảo dưỡng</p>
+                        <p class="warning-desc">Còn 4,320 km nữa — Mã: W03</p>
+                    </div>
+                    <span class="warning-arrow">›</span>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions fade-in-up" style="animation-delay: 0.2s">
+                <h3 class="section-title">Thao tác nhanh</h3>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="navigateToSupport('Xe tôi có vấn đề gì không?')">
+                        <div class="action-icon diag">🔍</div>
+                        <span class="action-label">Chẩn đoán</span>
+                    </button>
+                    <button class="action-btn" onclick="switchTab('charge')">
+                        <div class="action-icon charge">⚡</div>
+                        <span class="action-label">Trạm sạc</span>
+                    </button>
+                    <button class="action-btn" onclick="navigateToSupport('Tôi muốn đặt lịch bảo dưỡng')">
+                        <div class="action-icon book">📅</div>
+                        <span class="action-label">Đặt lịch</span>
+                    </button>
+                    <button class="action-btn" onclick="navigateToSupport('Cần cứu hộ khẩn cấp!')">
+                        <div class="action-icon sos">🚨</div>
+                        <span class="action-label">Cứu hộ</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ PAGE: HỖ TRỢ (Chat) ═════════════════════════════ -->
+        <div class="page chat-page" id="page-support">
+            <!-- Bot info header -->
+            <div class="chat-header-info">
+                <div class="chat-avatar">🤖</div>
+                <div class="chat-bot-info">
+                    <h3>NEO — Trợ lý AI</h3>
+                    <p class="chat-bot-status">Đang hoạt động</p>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome message -->
+                <div class="message bot">
+                    <div class="msg-avatar">🤖</div>
+                    <div>
+                        <div class="msg-bubble">
+                            Xin chào! Tôi là <strong>NEO</strong> — trợ lý AI của VinFast 🚗<br><br>
+                            Tôi có thể giúp bạn:<br>
+                            🔍 Chẩn đoán sự cố<br>
+                            ⚡ Tìm trạm sạc<br>
+                            📅 Đặt lịch dịch vụ<br>
+                            🌤️ Kiểm tra thời tiết<br>
+                            🚨 Hỗ trợ khẩn cấp<br><br>
+                            Hãy cho tôi biết bạn cần gì nhé!
+                        </div>
+                        <p class="msg-time">Bây giờ</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing indicator -->
+            <div class="typing-indicator" id="typingIndicator">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </div>
+
+            <!-- Suggestions -->
+            <div class="chat-suggestions" id="chatSuggestions">
+                <button class="suggestion-chip" onclick="sendSuggestion('Xe báo lỗi E12')">🔍 Lỗi E12</button>
+                <button class="suggestion-chip" onclick="sendSuggestion('Tìm trạm sạc gần nhất')">⚡ Trạm sạc</button>
+                <button class="suggestion-chip" onclick="sendSuggestion('Đặt lịch bảo dưỡng')">📅 Đặt lịch</button>
+                <button class="suggestion-chip" onclick="sendSuggestion('Thời tiết hôm nay')">🌤️ Thời tiết</button>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-area">
+                <div class="chat-input-wrap">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Nhập tin nhắn..." autocomplete="off">
+                </div>
+                <button class="chat-send-btn" id="chatSendBtn" aria-label="Send message">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- ══ PAGE: SẠC ════════════════════════════════════════ -->
+        <div class="page charge-page" id="page-charge">
+            <!-- Map placeholder -->
+            <div class="charge-map-placeholder">
+                <div class="map-content">
+                    <div class="map-icon">📍</div>
+                    <p class="map-text">Bản đồ trạm sạc</p>
+                    <p class="map-subtext">Hiển thị trạm sạc VinFast gần bạn</p>
+                </div>
+            </div>
+
+            <!-- Station list -->
+            <div class="station-list">
+                <h3 class="section-title">Trạm sạc gần nhất</h3>
+
+                <div class="station-card" id="station1">
+                    <div class="station-icon">⚡</div>
+                    <div class="station-info">
+                        <p class="station-name">VinFast Charging — Vincom Bà Triệu</p>
+                        <p class="station-address">191 Bà Triệu, Hai Bà Trưng, Hà Nội</p>
+                        <div class="station-meta">
+                            <span class="station-tag tag-available">🟢 3/5 trống</span>
+                            <span class="station-tag tag-distance">📍 1.2 km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="station-card" id="station2">
+                    <div class="station-icon">⚡</div>
+                    <div class="station-info">
+                        <p class="station-name">VinFast Charging — Times City</p>
+                        <p class="station-address">458 Minh Khai, Hai Bà Trưng, Hà Nội</p>
+                        <div class="station-meta">
+                            <span class="station-tag tag-available">🟢 2/4 trống</span>
+                            <span class="station-tag tag-distance">📍 2.8 km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="station-card" id="station3">
+                    <div class="station-icon">⚡</div>
+                    <div class="station-info">
+                        <p class="station-name">VinFast Charging — Royal City</p>
+                        <p class="station-address">72A Nguyễn Trãi, Thanh Xuân, Hà Nội</p>
+                        <div class="station-meta">
+                            <span class="station-tag tag-available">🟡 1/6 trống</span>
+                            <span class="station-tag tag-distance">📍 4.1 km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="station-card" id="station4">
+                    <div class="station-icon full">⚡</div>
+                    <div class="station-info">
+                        <p class="station-name">VinFast Charging — Aeon Mall Long Biên</p>
+                        <p class="station-address">27 Cổ Linh, Long Biên, Hà Nội</p>
+                        <div class="station-meta">
+                            <span class="station-tag tag-full">🔴 Đầy</span>
+                            <span class="station-tag tag-distance">📍 7.2 km</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ PAGE: CÁ NHÂN ═══════════════════════════════════ -->
+        <div class="page" id="page-profile">
+            <div class="profile-header">
+                <div class="profile-avatar">👤</div>
+                <div>
+                    <h2 class="profile-name">Nguyễn Văn A</h2>
+                    <p class="profile-email">nguyenvana@vinfast.vn</p>
+                </div>
+            </div>
+
+            <div class="profile-menu">
+                <div class="profile-menu-group">
+                    <div class="profile-menu-item">
+                        <div class="menu-icon blue">🚗</div>
+                        <span class="menu-text">Xe của tôi</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="profile-menu-item">
+                        <div class="menu-icon green">📅</div>
+                        <span class="menu-text">Lịch sử dịch vụ</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="profile-menu-item">
+                        <div class="menu-icon orange">⚡</div>
+                        <span class="menu-text">Lịch sử sạc</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                </div>
+
+                <div class="profile-menu-group">
+                    <div class="profile-menu-item">
+                        <div class="menu-icon purple">🔔</div>
+                        <span class="menu-text">Thông báo</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="profile-menu-item">
+                        <div class="menu-icon blue">⚙️</div>
+                        <span class="menu-text">Cài đặt</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                    <div class="profile-menu-item">
+                        <div class="menu-icon green">❓</div>
+                        <span class="menu-text">Trợ giúp & FAQ</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                </div>
+
+                <div class="profile-menu-group">
+                    <div class="profile-menu-item">
+                        <div class="menu-icon red">🚪</div>
+                        <span class="menu-text" style="color: var(--danger)">Đăng xuất</span>
+                        <span class="menu-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /page-container -->
+
+    <!-- ── Bottom Navigation ───────────────────────────────────── -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" data-tab="home" id="navHome">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>TRANG CHỦ</span>
+        </button>
+        <button class="nav-item nav-center" data-tab="support" id="navSupport">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+            </div>
+            <span>HỖ TRỢ</span>
+        </button>
+        <button class="nav-item" data-tab="charge" id="navCharge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>SẠC</span>
+        </button>
+        <button class="nav-item" data-tab="profile" id="navProfile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>CÁ NHÂN</span>
+        </button>
+    </nav>
+
+</div><!-- /phone-frame -->
+
+<script src="/js/app.js"></script>
+</body>
+</html>
