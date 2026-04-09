@@ -94,13 +94,78 @@
             </div>
 
             <!-- Warnings -->
-            <div class="warning-section fade-in-up" style="animation-delay: 0.1s">
+            <div class="warning-section fade-in-up" id="warningSection" style="animation-delay: 0.1s">
                 <h3 class="section-title">⚠️ Cảnh báo</h3>
-                <div class="warning-card" id="warningCard" onclick="navigateToSupport('Xe báo cảnh báo W03 — sắp đến hạn bảo dưỡng')">
+                <div class="warning-card" data-error-id="e15" onclick="openErrorFlow('e15')">
+                    <div class="warning-icon">🌡️</div>
+                    <div class="warning-content">
+                        <p class="warning-title">Lỗi E15 — Làm mát pin</p>
+                        <p class="warning-desc">Nhiệt độ pin tăng cao bất thường</p>
+                    </div>
+                    <div class="warning-status">
+                        <span class="status-badge" data-status="active">⭐ Chưa xử lý</span>
+                    </div>
+                    <span class="warning-arrow">›</span>
+                </div>
+                <div class="warning-card" data-error-id="w11" onclick="openErrorFlow('w11')">
+                    <div class="warning-icon">🛞</div>
+                    <div class="warning-content">
+                        <p class="warning-title">Lỗi W11 — Áp suất lốp thấp</p>
+                        <p class="warning-desc">Lốp trước trái dưới ngưỡng an toàn</p>
+                    </div>
+                    <div class="warning-status">
+                        <span class="status-badge" data-status="active">⭐ Chưa xử lý</span>
+                    </div>
+                    <span class="warning-arrow">›</span>
+                </div>
+                <div class="warning-card" data-error-id="e07" onclick="openErrorFlow('e07')">
+                    <div class="warning-icon">🔋</div>
+                    <div class="warning-content">
+                        <p class="warning-title">Lỗi E07 — Hiệu suất sạc giảm</p>
+                        <p class="warning-desc">Tốc độ sạc không ổn định</p>
+                    </div>
+                    <div class="warning-status">
+                        <span class="status-badge" data-status="active">⭐ Chưa xử lý</span>
+                    </div>
+                    <span class="warning-arrow">›</span>
+                </div>
+                <div class="warning-card" data-error-id="w21" onclick="openErrorFlow('w21')">
+                    <div class="warning-icon">🧭</div>
+                    <div class="warning-content">
+                        <p class="warning-title">Lỗi W21 — Cảm biến định vị</p>
+                        <p class="warning-desc">Tín hiệu GPS chập chờn</p>
+                    </div>
+                    <div class="warning-status">
+                        <span class="status-badge" data-status="active">⭐ Chưa xử lý</span>
+                    </div>
+                    <span class="warning-arrow">›</span>
+                </div>
+                <div class="warning-card" onclick="navigateToSupport('Xe báo cảnh báo W03 — sắp đến hạn bảo dưỡng')">
                     <div class="warning-icon">🔧</div>
                     <div class="warning-content">
                         <p class="warning-title">Sắp đến hạn bảo dưỡng</p>
                         <p class="warning-desc">Còn 4,320 km nữa — Mã: W03</p>
+                    </div>
+                    <span class="warning-arrow">›</span>
+                </div>
+                <div class="warning-card" onclick="openChargingStations('VinUni')">
+                    <div class="warning-icon">🔋</div>
+                    <div class="warning-content">
+                        <p class="warning-title">Sắp hết pin</p>
+                        <p class="warning-desc">Pin còn 15% — Mã: W15</p>
+                    </div>
+                    <span class="warning-arrow">›</span>
+                </div>
+            </div>
+
+            <!-- Booking Reminder -->
+            <div class="booking-reminder hidden" id="bookingReminder">
+                <h3 class="section-title">📅 Lịch hẹn sắp tới</h3>
+                <div class="booking-card" onclick="openFlowPage('booking-detail')">
+                    <div class="booking-content">
+                        <p class="booking-title" id="bookingTitle">VinFast Service — Times City</p>
+                        <p class="booking-meta" id="bookingMeta">16:30 • Hôm nay • Ước tính 2-3 giờ</p>
+                        <p class="booking-sub" id="bookingIssues">Sửa: E15</p>
                     </div>
                     <span class="warning-arrow">›</span>
                 </div>
@@ -250,6 +315,590 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: CẢNH BÁO LỖI (E15) ═══════════════════════ -->
+        <div class="page flow-page" id="page-error-e15">
+            <div class="flow-hero danger">
+                <p class="flow-eyebrow">Cảnh báo hệ thống</p>
+                <h2>Lỗi E15 — Hệ thống làm mát pin</h2>
+                <p class="flow-subtext">Xe phát hiện nhiệt độ pin bất thường khi vận hành.</p>
+            </div>
+
+            <div class="flow-card">
+                <div class="flow-row">
+                    <span class="flow-label">Mã lỗi</span>
+                    <span class="pill danger">E15</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Tình trạng</span>
+                    <span class="pill warning">Nguy cơ tăng nhiệt</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Khuyến nghị</span>
+                    <span class="pill info">Dừng xe, kiểm tra sớm</span>
+                </div>
+            </div>
+
+            <div class="flow-actions">
+                <button class="btn secondary" onclick="closeFlowToTab('home')">Bỏ qua</button>
+                <button class="btn primary" onclick="openFlowPage('explain')">Yêu cầu hỗ trợ</button>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: CẢNH BÁO LỖI (E07) ═══════════════════════ -->
+        <div class="page flow-page" id="page-error-e07">
+            <div class="flow-hero">
+                <p class="flow-eyebrow">Cảnh báo sạc</p>
+                <h2>Lỗi E07 — Hiệu suất sạc giảm</h2>
+                <p class="flow-subtext">Tốc độ sạc thay đổi thất thường trong 3 phiên gần nhất.</p>
+            </div>
+            <div class="flow-card">
+                <div class="flow-row">
+                    <span class="flow-label">Mã lỗi</span>
+                    <span class="pill danger">E07</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Tình trạng</span>
+                    <span class="pill warning">Hiệu suất giảm 25%</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Khuyến nghị</span>
+                    <span class="pill info">Kiểm tra hệ thống sạc</span>
+                </div>
+            </div>
+            <div class="flow-actions">
+                <button class="btn secondary" onclick="closeFlowToTab('home')">Bỏ qua</button>
+                <button class="btn primary" onclick="openFlowPage('actions')">Xem gợi ý</button>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: CẢNH BÁO LỖI (W11) ═══════════════════════ -->
+        <div class="page flow-page" id="page-error-w11">
+            <div class="flow-hero">
+                <p class="flow-eyebrow">Cảnh báo an toàn</p>
+                <h2>Lỗi W11 — Áp suất lốp thấp</h2>
+                <p class="flow-subtext">Lốp trước trái thấp hơn 0.6 bar so với chuẩn.</p>
+            </div>
+            <div class="flow-card">
+                <div class="flow-row">
+                    <span class="flow-label">Mã lỗi</span>
+                    <span class="pill warning">W11</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Tình trạng</span>
+                    <span class="pill warning">Áp suất thấp</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Khuyến nghị</span>
+                    <span class="pill info">Bơm lốp hoặc kiểm tra rò rỉ</span>
+                </div>
+            </div>
+            <div class="flow-actions">
+                <button class="btn secondary" onclick="closeFlowToTab('home')">Bỏ qua</button>
+                <button class="btn primary" onclick="openFlowPage('repair-guide')">Xem hướng dẫn</button>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: CẢNH BÁO LỖI (W21) ═══════════════════════ -->
+        <div class="page flow-page" id="page-error-w21">
+            <div class="flow-hero">
+                <p class="flow-eyebrow">Cảnh báo điều hướng</p>
+                <h2>Lỗi W21 — Cảm biến định vị</h2>
+                <p class="flow-subtext">Tín hiệu GPS yếu trong khu vực 15 phút qua.</p>
+            </div>
+            <div class="flow-card">
+                <div class="flow-row">
+                    <span class="flow-label">Mã lỗi</span>
+                    <span class="pill warning">W21</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Tình trạng</span>
+                    <span class="pill warning">Tín hiệu chập chờn</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Khuyến nghị</span>
+                    <span class="pill info">Kiểm tra ăng-ten GPS</span>
+                </div>
+            </div>
+            <div class="flow-actions">
+                <button class="btn secondary" onclick="closeFlowToTab('home')">Bỏ qua</button>
+                <button class="btn primary" onclick="openFlowPage('actions')">Xem gợi ý</button>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: GIẢI THÍCH CHẨN ĐOÁN ══════════════════════ -->
+        <div class="page flow-page" id="page-explain">
+            <div class="flow-section">
+                <h3>Vấn đề xe đang gặp</h3>
+                <p>Hệ thống làm mát pin hoạt động không ổn định, nhiệt độ pin có xu hướng tăng nhanh khi tải cao.</p>
+            </div>
+            <div class="flow-section">
+                <h3>Mức độ nghiêm trọng</h3>
+                <div class="severity-box">
+                    <span class="severity-level">Cao</span>
+                    <p>Khuyến nghị dừng xe ở nơi an toàn nếu nhiệt độ tăng nhanh.</p>
+                </div>
+            </div>
+            <div class="flow-section">
+                <h3>Đánh giá nhanh</h3>
+                <div class="assessment-grid">
+                    <div class="assessment-card">
+                        <p class="assessment-title">Tự sửa được?</p>
+                        <p class="assessment-value">Khó</p>
+                        <p class="assessment-note">Chỉ kiểm tra được các bước cơ bản.</p>
+                    </div>
+                    <div class="assessment-card">
+                        <p class="assessment-title">Gara chuyên dụng?</p>
+                        <p class="assessment-value">Nên</p>
+                        <p class="assessment-note">Cần thiết bị chẩn đoán pin.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-actions">
+                <button class="btn secondary" onclick="openFlowPage('error-e15')">Quay lại</button>
+                <button class="btn primary" onclick="openFlowPage('actions')">Tiếp tục</button>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: GỢI Ý HÀNH ĐỘNG ═══════════════════════════ -->
+        <div class="page flow-page" id="page-actions">
+            <div class="flow-section">
+                <h3>Gợi ý hành động</h3>
+                <p>Chọn cách xử lý phù hợp với tình trạng xe của bạn.</p>
+            </div>
+            <div class="option-grid">
+                <div class="option-card">
+                    <div class="option-icon">🛠️</div>
+                    <div class="option-content">
+                        <h4>Tự kiểm tra & sửa</h4>
+                        <p>Thực hiện các bước an toàn cơ bản trước khi đến gara.</p>
+                        <button class="btn ghost" onclick="openFlowPage('repair-guide')">Xem hướng dẫn</button>
+                    </div>
+                </div>
+                <div class="option-card">
+                    <div class="option-icon">🏪</div>
+                    <div class="option-content">
+                        <h4>Tìm gara gần nhất</h4>
+                        <p>Tự động đề xuất gara phù hợp với linh kiện và giờ mở cửa.</p>
+                        <button class="btn ghost" onclick="openFlowPage('garage')">Tìm gara</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: HƯỚNG DẪN TỰ SỬA ══════════════════════════ -->
+        <div class="page flow-page" id="page-repair-guide">
+            <div class="flow-section">
+                <h3>Hướng dẫn tự kiểm tra</h3>
+                <ol class="step-list">
+                    <li>Dừng xe ở nơi an toàn, tắt điều hòa và chờ 10 phút.</li>
+                    <li>Kiểm tra mức dung dịch làm mát (nếu có thể tiếp cận).</li>
+                    <li>Khởi động lại xe và theo dõi nhiệt độ trong 5 phút.</li>
+                    <li>Nếu cảnh báo vẫn còn, di chuyển chậm đến gara gần nhất.</li>
+                    <li>Trong trường hợp có mùi khét hoặc hơi nóng bất thường, dừng xe ngay.</li>
+                </ol>
+            </div>
+            <div class="flow-section">
+                <h3>Các tùy chọn xử lý nhanh</h3>
+                <div class="option-grid">
+                    <div class="option-card compact">
+                        <div class="option-icon">🔄</div>
+                        <div class="option-content">
+                            <h4>Khởi động lại hệ thống</h4>
+                            <p>Tắt xe 5-10 phút để hệ thống hạ nhiệt.</p>
+                        </div>
+                    </div>
+                    <div class="option-card compact">
+                        <div class="option-icon">🧊</div>
+                        <div class="option-content">
+                            <h4>Giảm tải pin</h4>
+                            <p>Hạn chế tăng tốc mạnh và bật chế độ Eco.</p>
+                        </div>
+                    </div>
+                    <div class="option-card compact">
+                        <div class="option-icon">🧰</div>
+                        <div class="option-content">
+                            <h4>Kiểm tra dụng cụ</h4>
+                            <p>Chuẩn bị đèn pin, khăn sạch, găng tay cách nhiệt.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-section">
+                <h3>Tài liệu chi tiết</h3>
+                <p>Tham khảo hướng dẫn đầy đủ và lưu ý an toàn trước khi thao tác.</p>
+                <button class="btn secondary" onclick="openFlowPage('repair-docs')">Mở tài liệu hướng dẫn</button>
+            </div>
+            <div class="flow-section">
+                <h3>Bước tiếp theo</h3>
+                <div class="resolution-actions">
+                    <button class="btn primary" onclick="openFeedback('self')">Gửi phản hồi</button>
+                    <button class="btn secondary" onclick="openFlowPage('garage')">Tìm gara gần nhất</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: TÀI LIỆU HƯỚNG DẪN ════════════════════════ -->
+        <div class="page flow-page" id="page-repair-docs">
+            <div class="flow-section">
+                <h3>Tài liệu hướng dẫn chuyên sâu</h3>
+                <div class="doc-list">
+                    <div class="doc-item">
+                        <div>
+                            <p class="doc-title">Quy trình kiểm tra hệ thống làm mát pin</p>
+                            <p class="doc-meta">Bản cập nhật 04/2026 • 12 phút đọc</p>
+                        </div>
+                        <button class="btn ghost">Đọc</button>
+                    </div>
+                    <div class="doc-item">
+                        <div>
+                            <p class="doc-title">Lưu ý an toàn khi xử lý cảnh báo nhiệt</p>
+                            <p class="doc-meta">Tài liệu an toàn • 8 phút đọc</p>
+                        </div>
+                        <button class="btn ghost">Đọc</button>
+                    </div>
+                    <div class="doc-item">
+                        <div>
+                            <p class="doc-title">Checklist trước khi mang xe đi gara</p>
+                            <p class="doc-meta">Danh sách • 5 phút</p>
+                        </div>
+                        <button class="btn ghost">Mở</button>
+                    </div>
+                    <div class="doc-item">
+                        <div>
+                            <p class="doc-title">Hướng dẫn tự chẩn đoán nhanh tại chỗ</p>
+                            <p class="doc-meta">Tổng quan • 6 phút đọc</p>
+                        </div>
+                        <button class="btn ghost">Đọc</button>
+                    </div>
+                    <div class="doc-item">
+                        <div>
+                            <p class="doc-title">Các dấu hiệu cần gọi cứu hộ ngay</p>
+                            <p class="doc-meta">Cảnh báo • 4 phút</p>
+                        </div>
+                        <button class="btn ghost">Đọc</button>
+                    </div>
+                    <div class="doc-item">
+                        <div>
+                            <p class="doc-title">Hướng dẫn xử lý lỗi áp suất lốp W11</p>
+                            <p class="doc-meta">Hướng dẫn • 7 phút đọc</p>
+                        </div>
+                        <button class="btn ghost">Đọc</button>
+                    </div>
+                    <div class="doc-item">
+                        <div>
+                            <p class="doc-title">Tối ưu hiệu suất sạc và tránh lỗi E07</p>
+                            <p class="doc-meta">Khuyến nghị • 6 phút đọc</p>
+                        </div>
+                        <button class="btn ghost">Đọc</button>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-actions">
+                <button class="btn secondary" onclick="openFlowPage('repair-guide')">Quay lại</button>
+                <button class="btn primary" onclick="openFlowPage('garage')">Tìm gara gần nhất</button>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: TÌM GARA ═══════════════════════════════════ -->
+        <div class="page flow-page" id="page-garage">
+            <div class="garage-map">
+                <iframe
+                    title="Google Map"
+                    src="https://www.google.com/maps?q=VinUniversity&output=embed"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+                <div class="map-overlay">
+                    <span class="map-pin">📍</span>
+                    <div>
+                        <p>Vị trí hiện tại: VinUniversity</p>
+                        <a class="map-link" href="https://www.google.com/maps/dir/?api=1&origin=VinUniversity&destination=VinFast+Service+Times+City" target="_blank" rel="noopener">Chỉ đường đến gara</a>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-section">
+                <h3>Đề xuất tốt nhất</h3>
+                <div class="garage-card highlight">
+                    <div class="garage-info">
+                        <h4>VinFast Service — Times City</h4>
+                        <p>458 Minh Khai, Hai Bà Trưng, Hà Nội</p>
+                        <div class="garage-tags">
+                            <span class="pill success">✅ Có linh kiện</span>
+                            <span class="pill info">🕒 Mở đến 21:00</span>
+                            <span class="pill warning">⏱️ Slot trống: 16:30</span>
+                            <span class="pill info">⏳ Ước tính 2-3 giờ</span>
+                        </div>
+                    </div>
+                    <div class="garage-actions">
+                        <button class="btn primary" onclick="setBookingGarage('VinFast Service — Times City', '2-3 giờ', 'VinFast Service Times City', true)">Đặt lịch</button>
+                        <button class="btn ghost" onclick="openFlowPage('garage-detail')">Chi tiết</button>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-section">
+                <h3>Các lựa chọn khác</h3>
+                <div class="garage-card">
+                    <div class="garage-info">
+                        <h4>VinFast Service — Royal City</h4>
+                        <p>72A Nguyễn Trãi, Thanh Xuân, Hà Nội</p>
+                        <p class="garage-meta">📞 1900 232389 • ⭐ 4.6 (1,230 đánh giá) • 7.8 km</p>
+                        <div class="garage-tags">
+                            <span class="pill warning">⚠️ Thiếu 1 linh kiện</span>
+                            <span class="pill info">🕒 Mở đến 20:00</span>
+                            <span class="pill success">⏱️ Slot trống: 17:00</span>
+                            <span class="pill info">⏳ Ước tính 3-4 giờ</span>
+                        </div>
+                    </div>
+                    <div class="garage-actions">
+                        <button class="btn primary" onclick="setBookingGarage('VinFast Service — Royal City', '3-4 giờ', 'VinFast Service Royal City', true)">Đặt lịch</button>
+                        <button class="btn ghost">Xem lịch</button>
+                    </div>
+                </div>
+                <div class="garage-card">
+                    <div class="garage-info">
+                        <h4>VinFast Service — Long Biên</h4>
+                        <p>27 Cổ Linh, Long Biên, Hà Nội</p>
+                        <p class="garage-meta">📞 1900 232389 • ⭐ 4.4 (860 đánh giá) • 12.1 km</p>
+                        <div class="garage-tags">
+                            <span class="pill success">✅ Có linh kiện</span>
+                            <span class="pill danger">🕒 Sắp đóng cửa (18:30)</span>
+                            <span class="pill warning">⏱️ Slot trống: 18:10</span>
+                            <span class="pill info">⏳ Ước tính 2 giờ</span>
+                        </div>
+                    </div>
+                    <div class="garage-actions">
+                        <button class="btn primary" onclick="setBookingGarage('VinFast Service — Long Biên', '2 giờ', 'VinFast Service Long Bien', true)">Đặt lịch</button>
+                        <button class="btn ghost">Xem lịch</button>
+                    </div>
+                </div>
+                <div class="garage-card">
+                    <div class="garage-info">
+                        <h4>VinFast Service — Ocean Park</h4>
+                        <p>Đa Tốn, Gia Lâm, Hà Nội</p>
+                        <p class="garage-meta">📞 1900 232389 • ⭐ 4.5 (640 đánh giá) • 5.2 km</p>
+                        <div class="garage-tags">
+                            <span class="pill success">✅ Có linh kiện</span>
+                            <span class="pill info">🕒 Mở đến 20:30</span>
+                            <span class="pill success">⏱️ Slot trống: 15:40</span>
+                            <span class="pill info">⏳ Ước tính 2-3 giờ</span>
+                        </div>
+                    </div>
+                    <div class="garage-actions">
+                        <button class="btn primary" onclick="setBookingGarage('VinFast Service — Ocean Park', '2-3 giờ', 'VinFast Service Ocean Park', true)">Đặt lịch</button>
+                        <button class="btn ghost">Xem lịch</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: CHI TIẾT GARA ═══════════════════════════ -->
+        <div class="page flow-page" id="page-garage-detail">
+            <div class="flow-section">
+                <h3>VinFast Service — Times City</h3>
+                <p>458 Minh Khai, Hai Bà Trưng, Hà Nội</p>
+                <p class="garage-meta">📞 1900 232389 • ⭐ 4.8 (2,540 đánh giá)</p>
+                <div class="garage-tags">
+                    <span class="pill success">✅ Có linh kiện E15</span>
+                    <span class="pill info">🕒 Mở cửa: 08:00 - 21:00</span>
+                    <span class="pill warning">⏱️ Slot gần nhất: 16:30</span>
+                    <span class="pill info">⏳ Ước tính 2-3 giờ</span>
+                </div>
+            </div>
+            <div class="flow-section">
+                <h3>Dịch vụ & tiện ích</h3>
+                <div class="detail-grid">
+                    <div>
+                        <p class="detail-label">Chẩn đoán pin</p>
+                        <p class="detail-value">Có</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Xe thay thế</p>
+                        <p class="detail-value">Có (đặt trước)</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Khu vực chờ</p>
+                        <p class="detail-value">Wifi + đồ uống</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Ước tính chi phí</p>
+                        <p class="detail-value">1.2 - 1.8 triệu</p>
+                    </div>
+                </div>
+                <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&origin=VinUniversity&destination=VinFast+Service+Times+City" target="_blank" rel="noopener">Mở bản đồ chỉ đường</a>
+            </div>
+            <div class="flow-actions">
+                <button class="btn secondary" onclick="openFlowPage('garage')">Quay lại</button>
+                <button class="btn primary" onclick="openFlowPage('booking')">Đặt lịch</button>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: ĐẶT LỊCH ═══════════════════════════════════ -->
+        <div class="page flow-page" id="page-booking">
+            <div class="flow-section">
+                <h3>Hẹn lịch sửa chữa</h3>
+                <p>Gara: <span id="bookingGarageName">VinFast Service — Times City</span></p>
+                <p class="text-muted">Từ VinUniversity • Ước tính <span id="bookingEstimate">2-3 giờ</span></p>
+            </div>
+
+            <!-- Multi-error selection -->
+            <div class="flow-section" id="errorSelectionSection">
+                <h3>Chọn lỗi cần sửa tại gara</h3>
+                <div class="error-checkbox-list">
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="error-selection" value="e15" checked> Lỗi E15 — Làm mát pin
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="error-selection" value="w11"> Lỗi W11 — Áp suất lốp thấp
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="error-selection" value="e07"> Lỗi E07 — Hiệu suất sạc giảm
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="error-selection" value="w21"> Lỗi W21 — Cảm biến định vị
+                    </label>
+                </div>
+            </div>
+
+            <form class="flow-section" id="bookingForm">
+                <label class="form-label">Chọn gara</label>
+                <select class="form-input" id="bookingGarage" required>
+                    <option value="VinFast Service — Times City" data-estimate="2-3 giờ" data-destination="VinFast Service Times City">Times City</option>
+                    <option value="VinFast Service — Royal City" data-estimate="3-4 giờ" data-destination="VinFast Service Royal City">Royal City</option>
+                    <option value="VinFast Service — Long Biên" data-estimate="2 giờ" data-destination="VinFast Service Long Bien">Long Biên</option>
+                    <option value="VinFast Service — Ocean Park" data-estimate="2-3 giờ" data-destination="VinFast Service Ocean Park">Ocean Park</option>
+                </select>
+
+                <label class="form-label">Chọn ngày</label>
+                <input class="form-input" type="date" id="bookingDate" required>
+
+                <label class="form-label">Chọn giờ</label>
+                <select class="form-input" id="bookingTime" required>
+                    <option value="">Chọn giờ hẹn</option>
+                    <option>15:30</option>
+                    <option>16:30</option>
+                    <option>17:00</option>
+                    <option>18:10</option>
+                    <option>19:30</option>
+                </select>
+
+                <label class="form-label">Yêu cầu thêm</label>
+                <textarea class="form-input" id="bookingNote" placeholder="Ví dụ: xe báo E15, cần kiểm tra làm mát"></textarea>
+
+                <div class="flow-actions">
+                    <button type="button" class="btn secondary" onclick="openFlowPage('garage')">Quay lại</button>
+                    <button type="submit" class="btn primary">Xác nhận</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ══ FLOW: ĐẶT LỊCH THÀNH CÔNG ═══════════════════════ -->
+        <div class="page flow-page" id="page-booking-success">
+            <div class="success-card">
+                <div class="success-icon">✅</div>
+                <h3>Đặt lịch thành công</h3>
+                <p id="bookingSuccessText">Bạn đã đặt lịch tại VinFast Service — Times City lúc 16:30 hôm nay.</p>
+            </div>
+            <div class="flow-actions">
+                <a class="btn secondary" id="bookingSuccessMapLink" href="https://www.google.com/maps/dir/?api=1&origin=VinUniversity&destination=VinFast+Service+Times+City" target="_blank" rel="noopener">Tham khảo bản đồ</a>
+                <button class="btn primary" onclick="closeFlowToTab('home')">Về trang chính</button>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: CHI TIẾT LỊCH HẸN ═════════════════════════ -->
+        <div class="page flow-page" id="page-booking-detail">
+            <div class="flow-section">
+                <h3>Chi tiết lịch hẹn</h3>
+                <div class="detail-grid">
+                    <div>
+                        <p class="detail-label">Gara</p>
+                        <p class="detail-value" id="bookingDetailGarage">VinFast Service — Times City</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Thời gian</p>
+                        <p class="detail-value" id="bookingDetailTime">16:30 • Hôm nay</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Ước tính sửa</p>
+                        <p class="detail-value" id="bookingDetailEstimate">2-3 giờ</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Lỗi cần sửa</p>
+                        <p class="detail-value" id="bookingDetailIssues">E15</p>
+                    </div>
+                </div>
+                <a class="btn ghost" id="bookingDetailMapLink" href="https://www.google.com/maps/dir/?api=1&origin=VinUniversity&destination=VinFast+Service+Times+City" target="_blank" rel="noopener">Chỉ đường</a>
+            </div>
+            <div class="flow-actions">
+                <button class="btn secondary" onclick="closeFlowToTab('home')">Về trang chính</button>
+                <button class="btn primary" onclick="openFeedback('garage')">Đã sửa xong</button>
+            </div>
+        </div>
+
+        <!-- ══ FLOW: FEEDBACK ═══════════════════════════════════ -->
+        <div class="page flow-page" id="page-feedback">
+            <div class="flow-section">
+                <h3>Phản hồi cho</h3>
+                <p class="text-muted" id="feedbackSourceText">Tự sửa tại chỗ</p>
+            </div>
+            <div class="flow-section">
+                <h3>Xe đã được xử lý chưa?</h3>
+                <div class="feedback-choice">
+                    <label><input type="radio" name="resolved" value="yes" checked> Đã xử lý</label>
+                    <label><input type="radio" name="resolved" value="no"> Chưa xử lý</label>
+                </div>
+            </div>
+            <div class="flow-section" id="garageFeedbackSection" hidden>
+                <h3>Đánh giá gara</h3>
+                <div class="feedback-detail">
+                    <label>Thái độ kỹ thuật viên</label>
+                    <div class="rating" data-rating="staff">
+                        <button class="star" data-star="1">★</button>
+                        <button class="star" data-star="2">★</button>
+                        <button class="star" data-star="3">★</button>
+                        <button class="star" data-star="4">★</button>
+                        <button class="star" data-star="5">★</button>
+                    </div>
+                    <label>Thời gian chờ</label>
+                    <select class="form-input">
+                        <option>Đúng hẹn</option>
+                        <option>Chậm dưới 30 phút</option>
+                        <option>Chậm 30-60 phút</option>
+                        <option>Chậm trên 60 phút</option>
+                    </select>
+                    <label>Chi phí so với dự kiến</label>
+                    <select class="form-input">
+                        <option>Đúng dự kiến</option>
+                        <option>Cao hơn 10-20%</option>
+                        <option>Cao hơn 20%</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flow-section">
+                <h3>Đánh giá trải nghiệm</h3>
+                <div class="rating" id="ratingStars">
+                    <button class="star" data-star="1">★</button>
+                    <button class="star" data-star="2">★</button>
+                    <button class="star" data-star="3">★</button>
+                    <button class="star" data-star="4">★</button>
+                    <button class="star" data-star="5">★</button>
+                </div>
+            </div>
+            <div class="flow-section" id="feedbackDetail" hidden>
+                <h3>Vấn đề chưa xử lý</h3>
+                <div class="feedback-detail">
+                    <label><input type="checkbox"> Tài liệu hướng dẫn khó hiểu</label>
+                    <label><input type="checkbox"> Không đủ dụng cụ</label>
+                    <label><input type="checkbox"> Thao tác không an toàn</label>
+                    <label><input type="checkbox"> Cảnh báo vẫn còn</label>
+                    <textarea placeholder="Mô tả thêm (tuỳ chọn)"></textarea>
+                </div>
+            </div>
+            <div class="flow-actions">
+                <button class="btn ghost" onclick="closeFlowToTab('home')">Bỏ qua</button>
+                <button class="btn primary" id="feedbackSubmit">Gửi phản hồi</button>
             </div>
         </div>
 
