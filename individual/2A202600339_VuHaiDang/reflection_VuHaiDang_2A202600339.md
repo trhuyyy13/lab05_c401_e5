@@ -18,13 +18,10 @@ Backend Developer & Prompt Engineer. Phụ trách xây dựng core logic cho ReA
 ## 3. SPEC mạnh/yếu  
 
 - **Mạnh nhất:**  
-  Hệ thống xử lý tốt **failure mode (LLM Hallucination)** trong flow bảo dưỡng. Khi người dùng đưa input mơ hồ (ví dụ: “xe cần bảo dưỡng”), Agent không vội gọi tool mà được thiết kế để đánh giá độ rõ ràng của request, sau đó yêu cầu người dùng cung cấp thêm thông tin (ví dụ: chọn loại phụ tùng). Điều này giúp giảm đáng kể việc sinh ra thông tin sai nhưng vẫn giữ trải nghiệm hội thoại tự nhiên.  
-  Ngoài ra, chatbot có khả năng **hỗ trợ 24/7**, giải quyết painpoint của các kênh hỗ trợ truyền thống (phụ thuộc hotline, thời gian chờ).
+  Chatbot có khả năng **hỗ trợ 24/7**, giải quyết painpoint của các kênh hỗ trợ truyền thống (phụ thuộc hotline, thời gian chờ).Hệ thống xử lý tốt **failure mode (LLM Hallucination)** trong flow bảo dưỡng. Khi người dùng đưa input mơ hồ (ví dụ: “xe cần bảo dưỡng”), Agent không vội gọi tool mà được thiết kế để đánh giá độ rõ ràng của request, sau đó yêu cầu người dùng cung cấp thêm thông tin (ví dụ: chọn loại phụ tùng). Điều này giúp giảm đáng kể việc sinh ra thông tin sai nhưng vẫn giữ trải nghiệm hội thoại tự nhiên.  
 
 - **Yếu nhất:**  
-  Hệ thống vẫn có rủi ro hallucination ở mức **end-to-end**, đặc biệt khi tool trả về dữ liệu chưa đầy đủ hoặc context không đủ rõ — AI có thể trả lời “nghe hợp lý nhưng sai”.  
-  Ngoài ra, do sử dụng ReAct loop, toàn bộ history và observation phải được đưa vào mỗi lượt suy luận, khiến context window tăng nhanh. Trong các phiên chat dài, Agent có thể mất focus (*lost in the middle*).  
-  Trong tương lai cần bổ sung **memory (summarization hoặc vector database)** và cơ chế **verification/fallback layer** để cải thiện độ ổn định.
+  Chưa có thước đo cụ thể về thời gian và chi phí để đánh giá cost–benefit một cách rõ ràng. Phần demo agent vẫn còn mang tính thử nghiệm: prompt chưa được test đầy đủ, dữ liệu chủ yếu là mock và chưa tích hợp hoàn chỉnh việc gọi tools với dữ liệu thực, nên chưa thể phản ánh chính xác hiệu quả thực tế của hệ thống.
 
 ---
 
@@ -45,18 +42,16 @@ Backend Developer & Prompt Engineer. Phụ trách xây dựng core logic cho ReA
 ---
 
 ## 6. Nếu làm lại  
+- Xây dựng SPEC chi tiết và rõ ràng từ đầu.  
 - Xác định kiến trúc agent ngay từ đầu (rõ ràng input/output và vai trò từng component) thay vì vừa phát triển vừa điều chỉnh.  
 - Thiết lập hệ thống đánh giá sớm (test case, metric) để tránh việc demo mang tính cảm tính.  
-- Xây dựng SPEC chi tiết và rõ ràng từ đầu, đồng thời làm nổi bật sự khác biệt của chatbot so với filter/search truyền thống.  
-- Đầu tư vào feedback loop (thu thập và tận dụng phản hồi người dùng) để cải thiện hệ thống liên tục.
 
 ---
 
 ## 7. AI giúp gì / AI sai gì  
 
 - **Giúp:**  
-  AI (Claude) hỗ trợ tốt trong việc tạo sample data có tính thực tế cao (tên linh kiện, thương hiệu, địa chỉ, khoảng cách), giúp nhanh chóng xây dựng dataset cho `parts_store_lookup.py`.
+  AI  hỗ trợ tốt trong việc tạo sample data có tính thực tế cao (tên linh kiện, thương hiệu, địa chỉ, khoảng cách), giúp nhanh chóng xây dựng dataset mock up kiểm thử cho `parts_store_lookup.py`.  Ngoài ra, AI còn giúp generate nhanh prompt, flow và ý tưởng, từ đó tăng tốc đáng kể quá trình thiết kế hệ thống.
 
 - **Sai / Mislead:**  
-  AI đôi khi đề xuất flow không thực tế (over-engineering, khó implement trong phạm vi dự án).  
-  Ngoài ra, code sinh ra không hoàn toàn tương thích với system hiện tại, cần chỉnh sửa đáng kể để integrate.
+  AI đôi khi đề xuất flow không thực tế, khó implement trong phạm vi dự án.  Ngoài ra, code sinh ra không hoàn toàn tương thích với system hiện tại, cần chỉnh sửa đáng kể để integrate.
