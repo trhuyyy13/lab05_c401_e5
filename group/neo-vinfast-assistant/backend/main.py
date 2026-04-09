@@ -13,11 +13,10 @@ from pathlib import Path
 # Thêm backend/ vào path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import uvicorn
 
 from mock.mock_llm import mock_react_response
@@ -93,30 +92,29 @@ async def health_check():
     }
 
 
-@app.post("/api/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
+@app.post("/api/chat")
+async def chat(payload: dict = Body(...)):
     """
     Chat endpoint — nhận message từ user, trả response từ agent.
-    
-    Hiện tại dùng Mock LLM. Khi có API key:
-    1. Import build_graph từ agent.graph
-    2. Thay mock_react_response bằng graph.invoke()
     """
-    result = mock_react_response(request.message)
+    message = payload.get("message", "")
+    session_id = payload.get("session_id", "default")
     
-    return ChatResponse(
-        answer=result["answer"],
-        reasoning_steps=result["reasoning_steps"],
-        tool_used=result.get("tool_used"),
-        tool_input=result.get("tool_input", {}),
-    )
+    result = mock_react_response(message)
+    
+    return {
+        "answer": result["answer"],
+        "reasoning_steps": result["reasoning_steps"],
+        "tool_used": result.get("tool_used"),
+        "tool_input": result.get("tool_input", {}),
+    }
 
 
-@app.get("/api/tools", response_model=list[ToolInfo])
+@app.get("/api/tools")
 async def list_tools():
     """Liệt kê tất cả tools đã load."""
     return [
-        ToolInfo(name=t.name, description=t.description)
+        {"name": t.name, "description": t.description}
         for t in all_tools
     ]
 
