@@ -13,14 +13,16 @@ from pathlib import Path
 # Thêm backend/ vào path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from fastapi import FastAPI, Request, Body
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import uvicorn
 
 from mock.mock_llm import mock_react_response
 from tools import all_tools
+from tools.charging_station import get_nearest_charging_stations_data
 
 
 # ── FastAPI App ───────────────────────────────────────────────────────
@@ -47,6 +49,28 @@ if frontend_dir.exists():
     app.mount("/assets", StaticFiles(directory=str(frontend_dir / "assets")), name="assets")
 
 
+# ── Pydantic Models ──────────────────────────────────────────────────
+class ChatRequest(BaseModel):
+    message: str
+    session_id: str = "default"
+
+
+class ChatResponse(BaseModel):
+    answer: str
+    reasoning_steps: list[dict]
+    tool_used: str | None = None
+    tool_input: dict = {}
+
+
+class ToolInfo(BaseModel):
+    name: str
+    description: str
+
+
+class ChargingStationSearchRequest(BaseModel):
+    location: str = "VinUni"
+
+
 # ── API Endpoints ────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend():
@@ -69,31 +93,38 @@ async def health_check():
     }
 
 
-@app.post("/api/chat")
-async def chat(payload: dict = Body(...)):
+@app.post("/api/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
     """
     Chat endpoint — nhận message từ user, trả response từ agent.
+    
+    Hiện tại dùng Mock LLM. Khi có API key:
+    1. Import build_graph từ agent.graph
+    2. Thay mock_react_response bằng graph.invoke()
     """
-    message = payload.get("message", "")
-    session_id = payload.get("session_id", "default")
+    result = mock_react_response(request.message)
     
-    result = mock_react_response(message)
-    
-    return {
-        "answer": result["answer"],
-        "reasoning_steps": result["reasoning_steps"],
-        "tool_used": result.get("tool_used"),
-        "tool_input": result.get("tool_input", {}),
-    }
+    return ChatResponse(
+        answer=result["answer"],
+        reasoning_steps=result["reasoning_steps"],
+        tool_used=result.get("tool_used"),
+        tool_input=result.get("tool_input", {}),
+    )
 
 
-@app.get("/api/tools")
+@app.get("/api/tools", response_model=list[ToolInfo])
 async def list_tools():
     """Liệt kê tất cả tools đã load."""
     return [
-        {"name": t.name, "description": t.description}
+        ToolInfo(name=t.name, description=t.description)
         for t in all_tools
     ]
+
+
+@app.post("/api/charging-stations")
+async def search_charging_stations(request: ChargingStationSearchRequest):
+    """Tìm 3 trạm sạc gần nhất từ địa chỉ nhập bằng văn bản."""
+    return get_nearest_charging_stations_data(request.location)
 
 
 @app.get("/api/vehicle/status")
@@ -102,13 +133,14 @@ async def vehicle_status():
     return {
         "model": "VinFast VF 8 Plus",
         "plate": "30A-123.45",
-        "battery_percent": 72,
-        "range_km": 245,
+        "battery_percent": 15,
+        "range_km": 42,
         "odometer_km": 15680,
         "next_service_km": 20000,
         "tire_pressure": {"fl": 2.3, "fr": 2.3, "rl": 2.4, "rr": 2.4},
         "warnings": [
             {"code": "W03", "message": "Sắp đến hạn bảo dưỡng", "severity": "low"},
+            {"code": "W15", "message": "Pin sắp hết, cần sạc sớm", "severity": "medium"},
         ],
     }
 
