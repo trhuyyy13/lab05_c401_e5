@@ -257,18 +257,56 @@
         <div class="page charge-page" id="page-charge">
             <!-- Map placeholder -->
             <div class="charge-map-placeholder">
-                <div class="map-content">
-                    <div class="map-icon">📍</div>
-                    <p class="map-text">Bản đồ trạm sạc</p>
-                    <p class="map-subtext">Hiển thị trạm sạc VinFast gần bạn</p>
+                <div class="fake-map-grid"></div>
+                <div class="fake-road road-main"></div>
+                <div class="fake-road road-cross"></div>
+                <div class="fake-road road-curve"></div>
+                <div class="fake-green park-1"></div>
+                <div class="fake-green park-2"></div>
+                <div class="fake-water"></div>
+                <div class="map-pin-marker user-pin">
+                    <span>📍</span>
+                    <small>Bạn</small>
+                </div>
+                <div class="map-pin-marker station-pin">
+                    <span>⚡</span>
+                    <small>Trạm sạc</small>
+                </div>
+                <div class="map-route-line"></div>
+                <div class="map-route-dot start"></div>
+                <div class="map-route-dot end"></div>
+                <div class="map-glow glow-1"></div>
+                <div class="map-glow glow-2"></div>
+                <div class="map-overlay-card">
+                    <p class="map-text">Bản đồ trạm sạc VinFast</p>
+                    <p class="map-subtext" id="chargeResolvedLocation">Hiển thị trạm sạc VinFast gần bạn</p>
+                    <div class="map-overlay-row">
+                        <span class="map-pill">Đang mở rộng vùng tìm kiếm</span>
+                        <span class="map-pill accent">Tối ưu pin còn lại</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Station list -->
             <div class="station-list">
                 <h3 class="section-title">Trạm sạc gần nhất</h3>
+                <div class="charge-toolbar">
+                    <input
+                        type="text"
+                        class="form-input"
+                        id="chargeLocationInput"
+                        value="VinUni"
+                        placeholder="Nhập khu vực, ví dụ: VinUni, Gia Lâm, Hà Nội"
+                        autocomplete="off"
+                    >
+                    <button class="btn primary" id="chargeSearchBtn" type="button">Tìm trạm</button>
+                </div>
+                <div class="station-list-head">
+                    <p class="text-muted" id="stationListSummary">Đang tải dữ liệu...</p>
+                </div>
+                <div id="stationResults"></div>
 
-                <div class="station-card" id="station1">
+                <div class="station-card" id="station1" onclick="openStationMap('vinuni-main-gate')" hidden>
                     <div class="station-icon">⚡</div>
                     <div class="station-info">
                         <p class="station-name">VinFast Charging — Vincom Bà Triệu</p>
@@ -280,7 +318,7 @@
                     </div>
                 </div>
 
-                <div class="station-card" id="station2">
+                <div class="station-card" id="station2" onclick="openStationMap('vinuni-parking-a')" hidden>
                     <div class="station-icon">⚡</div>
                     <div class="station-info">
                         <p class="station-name">VinFast Charging — Times City</p>
@@ -292,7 +330,7 @@
                     </div>
                 </div>
 
-                <div class="station-card" id="station3">
+                <div class="station-card" id="station3" onclick="openStationMap('vinuni-dormitory')" hidden>
                     <div class="station-icon">⚡</div>
                     <div class="station-info">
                         <p class="station-name">VinFast Charging — Royal City</p>
@@ -304,7 +342,7 @@
                     </div>
                 </div>
 
-                <div class="station-card" id="station4">
+                <div class="station-card" id="station4" onclick="openStationMap('ocean-park-gateway')" hidden>
                     <div class="station-icon full">⚡</div>
                     <div class="station-info">
                         <p class="station-name">VinFast Charging — Aeon Mall Long Biên</p>
@@ -318,7 +356,73 @@
             </div>
         </div>
 
-        <!-- ══ FLOW: CẢNH BÁO LỖI (E15) ═══════════════════════ -->
+        <!-- ══ PAGE: CHI TIẾT TRẠM SẠC ═══════════════════════ -->
+        <div class="page flow-page" id="page-charge-map">
+            <div class="flow-hero">
+                <p class="flow-eyebrow">Trạm sạc được chọn</p>
+                <h2 id="directionStationName">VinFast Charging</h2>
+                <p class="flow-subtext" id="directionStationAddress">Chọn một trạm để xem chi tiết</p>
+            </div>
+
+            <div class="flow-card">
+                <div class="flow-row">
+                    <span class="flow-label">Xuất phát</span>
+                    <span id="routeOrigin">VinUni</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Điểm đến</span>
+                    <span id="routeDestination">---</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">ETA</span>
+                    <span id="routeEta">---</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Khoảng cách</span>
+                    <span id="directionDistance">---</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Loại sạc</span>
+                    <span id="directionType">---</span>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-label">Thời gian ước tính</span>
+                    <span id="directionTime">---</span>
+                </div>
+            </div>
+
+            <div class="flow-section">
+                <h3>Kiểm tra pin</h3>
+                <div class="detail-grid">
+                    <div>
+                        <p class="detail-label">Pin hiện tại</p>
+                        <p class="detail-value" id="batteryCurrent">---</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Cần để tới trạm</p>
+                        <p class="detail-value" id="batteryNeeded">---</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Còn lại</p>
+                        <p class="detail-value" id="batteryRemaining">---</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Đánh giá</p>
+                        <p class="detail-value">
+                            <span class="battery-check-badge" id="batteryCheckBadge">---</span>
+                        </p>
+                    </div>
+                </div>
+                <p class="text-muted" id="batteryCheckTitle"></p>
+                <p class="text-muted" id="batteryCheckNote"></p>
+            </div>
+
+            <div class="flow-actions">
+                <button class="btn secondary" onclick="switchTab('charge')">Quay lại danh sách</button>
+                <a class="btn primary" id="stationMapLink" href="https://www.google.com/maps" target="_blank" rel="noopener" onclick="setTimeout(() => openFeedback('charge'), 150);">Mở bản đồ</a>
+            </div>
+        </div>
+
         <div class="page flow-page" id="page-error-e15">
             <div class="flow-hero danger">
                 <p class="flow-eyebrow">Cảnh báo hệ thống</p>
@@ -843,7 +947,30 @@
                 <h3>Phản hồi cho</h3>
                 <p class="text-muted" id="feedbackSourceText">Tự sửa tại chỗ</p>
             </div>
-            <div class="flow-section">
+            <div class="flow-section" id="chargeFeedbackSection" hidden>
+                <h3>Phản hồi trạm sạc</h3>
+                <div class="feedback-detail">
+                    <label>Bản đồ / gợi ý có hữu ích không?</label>
+                    <div class="feedback-choice">
+                        <label><input type="radio" name="useful" value="useful" checked> Hữu ích</label>
+                        <label><input type="radio" name="useful" value="not_useful"> Không hữu ích</label>
+                    </div>
+                    <label>Đã xử lý xong chưa?</label>
+                    <div class="feedback-choice">
+                        <label><input type="radio" name="station-resolved" value="yes" checked> Đã xử lý xong</label>
+                        <label><input type="radio" name="station-resolved" value="no"> Chưa xử lý xong</label>
+                    </div>
+                    <label>Đánh giá trải nghiệm</label>
+                    <div class="rating" id="stationFeedbackStars">
+                        <button class="star" data-star="1">★</button>
+                        <button class="star" data-star="2">★</button>
+                        <button class="star" data-star="3">★</button>
+                        <button class="star" data-star="4">★</button>
+                        <button class="star" data-star="5">★</button>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-section" id="resolvedSection">
                 <h3>Xe đã được xử lý chưa?</h3>
                 <div class="feedback-choice">
                     <label><input type="radio" name="resolved" value="yes" checked> Đã xử lý</label>

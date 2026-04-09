@@ -64,6 +64,10 @@ const bookingState = {
 
 const feedbackState = {
     source: 'self',
+    stationId: null,
+    useful: 'useful',
+    resolved: 'yes',
+    rating: 5,
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -282,22 +286,39 @@ function openStationMap(stationId) {
     const batteryTrip = calculateBatteryTrip(station);
     const etaMinutes = Math.max(6, Math.round(station.distance_km * 2.8));
 
-    document.getElementById('routeOrigin').textContent = stationSearchState.resolvedLocation;
-    document.getElementById('routeDestination').textContent = station.name;
-    document.getElementById('routeEta').textContent = `${etaMinutes} phut`;
-    document.getElementById('directionStationName').textContent = station.name;
-    document.getElementById('directionStationAddress').textContent = station.address;
-    document.getElementById('directionDistance').textContent = `${station.distance_km} km`;
-    document.getElementById('directionType').textContent = station.type;
-    document.getElementById('directionTime').textContent = `~${etaMinutes} phut`;
-    document.getElementById('batteryCurrent').textContent = `${vehicleStatusState.batteryPercent}%`;
-    document.getElementById('batteryNeeded').textContent = `${batteryTrip.requiredPercent}%`;
-    document.getElementById('batteryRemaining').textContent = `${batteryTrip.remainingPercent}%`;
-    document.getElementById('batteryCheckTitle').textContent = batteryTrip.title;
-    document.getElementById('batteryCheckNote').textContent = batteryTrip.note;
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+
+    stationSearchState.activeStationId = station.id;
+    feedbackState.stationId = station.id;
+    setText('routeOrigin', stationSearchState.resolvedLocation);
+    setText('routeDestination', station.name);
+    setText('routeEta', `${etaMinutes} phut`);
+    setText('directionStationName', station.name);
+    setText('directionStationAddress', station.address);
+    setText('directionDistance', `${station.distance_km} km`);
+    setText('directionType', station.type);
+    setText('directionTime', `~${etaMinutes} phut`);
+    setText('batteryCurrent', `${vehicleStatusState.batteryPercent}%`);
+    setText('batteryNeeded', `${batteryTrip.requiredPercent}%`);
+    setText('batteryRemaining', `${batteryTrip.remainingPercent}%`);
+    setText('batteryCheckTitle', batteryTrip.title);
+    setText('batteryCheckNote', batteryTrip.note);
+
     const batteryBadge = document.getElementById('batteryCheckBadge');
-    batteryBadge.textContent = batteryTrip.label;
-    batteryBadge.className = `battery-check-badge ${batteryTrip.status}`;
+    if (batteryBadge) {
+        batteryBadge.textContent = batteryTrip.label;
+        batteryBadge.className = `battery-check-badge ${batteryTrip.status}`;
+    }
+
+    const stationMapLink = document.getElementById('stationMapLink');
+    if (stationMapLink) {
+        const origin = encodeURIComponent(stationSearchState.resolvedLocation || 'VinUni');
+        const destination = encodeURIComponent(station.address || station.name);
+        stationMapLink.href = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
+    }
 
     switchTab('charge-map');
 }
@@ -449,15 +470,34 @@ function openFeedback(source) {
     feedbackState.source = source || 'self';
     const sourceText = document.getElementById('feedbackSourceText');
     const garageSection = document.getElementById('garageFeedbackSection');
+    const chargeSection = document.getElementById('chargeFeedbackSection');
+    const resolvedSection = document.getElementById('resolvedSection');
+    const feedbackDetail = document.getElementById('feedbackDetail');
 
     if (sourceText) {
-        sourceText.textContent = feedbackState.source === 'garage'
-            ? 'Trải nghiệm tại gara'
-            : 'Tự sửa tại chỗ';
+        if (feedbackState.source === 'garage') {
+            sourceText.textContent = 'Trải nghiệm tại gara';
+        } else if (feedbackState.source === 'charge') {
+            sourceText.textContent = 'Trạm sạc và bản đồ chỉ đường';
+        } else {
+            sourceText.textContent = 'Tự sửa tại chỗ';
+        }
     }
 
     if (garageSection) {
         garageSection.hidden = feedbackState.source !== 'garage';
+    }
+
+    if (chargeSection) {
+        chargeSection.hidden = feedbackState.source !== 'charge';
+    }
+
+    if (resolvedSection) {
+        resolvedSection.hidden = feedbackState.source === 'charge';
+    }
+
+    if (feedbackDetail) {
+        feedbackDetail.hidden = feedbackState.source === 'charge' || feedbackState.source === 'garage';
     }
 
     openFlowPage('feedback');
@@ -766,8 +806,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackDetail = document.getElementById('feedbackDetail');
     document.querySelectorAll('input[name="resolved"]').forEach((input) => {
         input.addEventListener('change', () => {
-            if (!feedbackDetail) return;
+            if (!feedbackDetail || feedbackState.source === 'charge') return;
             feedbackDetail.hidden = input.value !== 'no';
+        });
+    });
+
+    document.querySelectorAll('input[name="station-resolved"]').forEach((input) => {
+        input.addEventListener('change', () => {
+            feedbackState.resolved = input.value;
+        });
+    });
+
+    document.querySelectorAll('input[name="useful"]').forEach((input) => {
+        input.addEventListener('change', () => {
+            feedbackState.useful = input.value;
         });
     });
 
@@ -777,6 +829,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const star = e.target.closest('.star');
             if (!star) return;
             const rating = Number(star.dataset.star || 0);
+            if (ratingBlock.id === 'stationFeedbackStars') {
+                feedbackState.rating = rating;
+            }
             ratingBlock.querySelectorAll('.star').forEach((btn) => {
                 const value = Number(btn.dataset.star || 0);
                 btn.classList.toggle('active', value <= rating);
@@ -812,6 +867,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset booking state
             bookingState.active = false;
             bookingState.selectedErrors = [];
+        } else if (feedbackState.source === 'charge') {
+            console.log('Charge feedback:', {
+                stationId: feedbackState.stationId,
+                useful: feedbackState.useful,
+                resolved: feedbackState.resolved,
+                rating: feedbackState.rating,
+            });
         } else {
             // For self-repair feedback, mark current error as resolved
             if (currentErrorId && errorsState[currentErrorId]) {

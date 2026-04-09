@@ -46,10 +46,10 @@ def discover_tools() -> list[BaseTool]:
             for name, obj in inspect.getmembers(module):
                 if isinstance(obj, BaseTool):
                     tools.append(obj)
-                    print(f"  ✅ Loaded tool: {obj.name} (from {module_info.name}.py)")
+                    print(f"  Loaded tool: {obj.name} (from {module_info.name}.py)")
                     
         except Exception as e:
-            print(f"  ⚠️ Failed to load {module_info.name}: {e}")
+            print(f"  Failed to load {module_info.name}: {e}")
     
     return tools
 
