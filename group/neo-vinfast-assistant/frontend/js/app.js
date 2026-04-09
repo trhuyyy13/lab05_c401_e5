@@ -14,6 +14,15 @@ const TYPING_DELAY = 1200; // ms simulate typing
 // ═══════════════════════════════════════════════════════════════════
 let currentTab = 'home';
 let isProcessing = false;
+let stationSearchState = {
+    location: 'VinUni',
+    resolvedLocation: 'VinUniversity, Vinhomes Ocean Park, Gia Lâm, Hà Nội',
+    stations: [],
+};
+let vehicleStatusState = {
+    batteryPercent: 15,
+    rangeKm: 42,
+};
 
 // ═══════════════════════════════════════════════════════════════════
 // DOM Elements
@@ -23,6 +32,39 @@ const chatInput      = document.getElementById('chatInput');
 const chatSendBtn    = document.getElementById('chatSendBtn');
 const typingIndicator = document.getElementById('typingIndicator');
 const bottomNav      = document.getElementById('bottomNav');
+const headerBack     = document.getElementById('headerBack');
+const chargeLocationInput = document.getElementById('chargeLocationInput');
+const chargeSearchBtn = document.getElementById('chargeSearchBtn');
+const stationResults = document.getElementById('stationResults');
+const stationListSummary = document.getElementById('stationListSummary');
+const chargeResolvedLocation = document.getElementById('chargeResolvedLocation');
+
+function calculateBatteryTrip(station) {
+    const batteryPercent = vehicleStatusState.batteryPercent || 0;
+    const rangeKm = vehicleStatusState.rangeKm || 0;
+    const kmPerPercent = batteryPercent > 0 ? rangeKm / batteryPercent : 0;
+    const requiredPercent = kmPerPercent > 0 ? Math.max(1, Math.ceil(station.distance_km / kmPerPercent)) : 100;
+    const remainingPercent = Math.max(0, Math.round((batteryPercent - requiredPercent) * 10) / 10);
+
+    let status = 'feasible';
+    let label = 'Khả thi';
+    let title = 'Đủ pin để đến trạm';
+    let note = 'Bạn có thể tới trạm và vẫn còn mức pin an toàn.';
+
+    if (requiredPercent > batteryPercent) {
+        status = 'unreachable';
+        label = 'Không đủ pin';
+        title = 'Không đủ pin để tới trạm';
+        note = 'Quãng đường ước tính vượt quá mức pin hiện tại. Bạn nên chọn trạm gần hơn hoặc gọi hỗ trợ.';
+    } else if (remainingPercent <= 5) {
+        status = 'risky';
+        label = 'Cẩn trọng';
+        title = 'Có thể tới nhưng pin dự phòng thấp';
+        note = 'Xe có thể tới trạm nhưng mức pin dự phòng thấp. Nên bật chế độ tiết kiệm năng lượng.';
+    }
+
+    return { requiredPercent, remainingPercent, status, label, title, note };
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // Tab Navigation (SPA)
@@ -40,12 +82,18 @@ function switchTab(tabName) {
     
     if (page) page.classList.add('active');
     if (nav)  nav.classList.add('active');
+    if (!nav && tabName === 'charge-map') {
+        document.querySelector(`.nav-item[data-tab="charge"]`)?.classList.add('active');
+    }
     
     currentTab = tabName;
     
     // Auto-focus chat input when switching to support
     if (tabName === 'support') {
         setTimeout(() => chatInput?.focus(), 400);
+    }
+    if (tabName === 'charge') {
+        setTimeout(() => chargeLocationInput?.focus(), 250);
     }
 }
 
@@ -66,6 +114,117 @@ function navigateToSupport(message) {
     if (message) {
         setTimeout(() => sendMessage(message), 500);
     }
+}
+
+function renderStationResults(stations) {
+    if (!stationResults) return;
+
+    if (!stations || stations.length === 0) {
+        stationResults.innerHTML = '<div class="station-empty">Không tìm thấy trạm sạc phù hợp cho khu vực này.</div>';
+        return;
+    }
+
+    stationResults.innerHTML = stations.map((station) => {
+        const iconClass = station.available > 0 ? 'station-icon' : 'station-icon full';
+        const availabilityClass = station.available > 0 ? 'tag-available' : 'tag-full';
+        const availabilityText = station.available > 0
+            ? `${station.available}/${station.total} trống`
+            : 'Đầy';
+
+        return `
+            <div class="station-card" onclick="openStationMap('${station.id}')">
+                <div class="${iconClass}">⚡</div>
+                <div class="station-info">
+                    <p class="station-name">${station.name}</p>
+                    <p class="station-address">${station.address}</p>
+                    <div class="station-meta">
+                        <span class="station-tag ${availabilityClass}">${station.available > 0 ? '🟢' : '🔴'} ${availabilityText}</span>
+                        <span class="station-tag tag-distance">📍 ${station.distance_km} km</span>
+                    </div>
+                    <div class="station-meta" style="margin-top: 8px;">
+                        <span class="station-tag tag-distance">${station.type}</span>
+                        <span class="station-tag tag-distance">~${station.charge_time_min} phút</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function loadChargingStations(location = 'VinUni') {
+    const query = location?.trim() || 'VinUni';
+
+    if (stationListSummary) {
+        stationListSummary.textContent = 'Đang tìm trạm sạc gần bạn...';
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/api/charging-stations`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ location: query }),
+        });
+
+        if (!response.ok) throw new Error('Charging station API error');
+
+        const data = await response.json();
+        stationSearchState = {
+            location: query,
+            resolvedLocation: data.resolved_location,
+            stations: data.stations || [],
+        };
+
+        if (chargeResolvedLocation) {
+            chargeResolvedLocation.textContent = data.resolved_location;
+        }
+        if (chargeLocationInput) {
+            chargeLocationInput.value = query;
+        }
+        if (stationListSummary) {
+            stationListSummary.textContent = `${data.stations.length} trạm sạc gần nhất`;
+        }
+
+        renderStationResults(data.stations);
+    } catch (error) {
+        console.error('Charging station error:', error);
+        if (stationListSummary) {
+            stationListSummary.textContent = 'Không thể tải trạm sạc';
+        }
+        if (stationResults) {
+            stationResults.innerHTML = '<div class="station-empty">Không thể tải dữ liệu trạm sạc. Vui lòng kiểm tra backend.</div>';
+        }
+    }
+}
+
+function openChargingStations(location = 'VinUni') {
+    switchTab('charge');
+    loadChargingStations(location);
+}
+
+function openStationMap(stationId) {
+    const station = stationSearchState.stations.find((item) => item.id === stationId);
+    if (!station) return;
+    const batteryTrip = calculateBatteryTrip(station);
+    const etaMinutes = Math.max(6, Math.round(station.distance_km * 2.8));
+
+    document.getElementById('routeOrigin').textContent = stationSearchState.resolvedLocation;
+    document.getElementById('routeDestination').textContent = station.name;
+    document.getElementById('routeEta').textContent = `${etaMinutes} phút`;
+    document.getElementById('directionStationName').textContent = station.name;
+    document.getElementById('directionStationAddress').textContent = station.address;
+    document.getElementById('directionDistance').textContent = `${station.distance_km} km`;
+    document.getElementById('directionType').textContent = station.type;
+    document.getElementById('directionTime').textContent = `~${etaMinutes} phút`;
+    document.getElementById('batteryCurrent').textContent = `${vehicleStatusState.batteryPercent}%`;
+    document.getElementById('batteryNeeded').textContent = `${batteryTrip.requiredPercent}%`;
+    document.getElementById('batteryRemaining').textContent = `${batteryTrip.remainingPercent}%`;
+    document.getElementById('batteryCheckTitle').textContent = batteryTrip.title;
+    document.getElementById('batteryCheckNote').textContent = batteryTrip.note;
+    const batteryBadge = document.getElementById('batteryCheckBadge');
+    batteryBadge.textContent = batteryTrip.label;
+    batteryBadge.className = `battery-check-badge ${batteryTrip.status}`;
+
+    switchTab('charge-map');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -218,6 +377,27 @@ chatInput?.addEventListener('keydown', (e) => {
     }
 });
 
+chargeSearchBtn?.addEventListener('click', () => {
+    loadChargingStations(chargeLocationInput?.value || 'VinUni');
+});
+
+chargeLocationInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        loadChargingStations(chargeLocationInput.value);
+    }
+});
+
+headerBack?.addEventListener('click', () => {
+    if (currentTab === 'charge-map') {
+        switchTab('charge');
+        return;
+    }
+    if (currentTab !== 'home') {
+        switchTab('home');
+    }
+});
+
 // ═══════════════════════════════════════════════════════════════════
 // Load Vehicle Data from API
 // ═══════════════════════════════════════════════════════════════════
@@ -233,6 +413,10 @@ async function loadVehicleStatus() {
         document.getElementById('vehiclePlate').textContent = data.plate;
         document.getElementById('batteryNum').textContent = data.battery_percent;
         document.getElementById('batteryRange').textContent = data.range_km;
+        vehicleStatusState = {
+            batteryPercent: data.battery_percent,
+            rangeKm: data.range_km,
+        };
         document.getElementById('odometer').textContent = data.odometer_km.toLocaleString() + ' km';
         document.getElementById('nextService').textContent = data.next_service_km.toLocaleString() + ' km';
         
@@ -268,6 +452,7 @@ async function loadVehicleStatus() {
 // ═══════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
     loadVehicleStatus();
+    loadChargingStations('VinUni');
     
     // Animate battery ring on load
     const ring = document.getElementById('batteryRing');

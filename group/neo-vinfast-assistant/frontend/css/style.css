@@ -554,6 +554,12 @@ body {
     margin-bottom: 16px;
 }
 
+.warning-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .section-title {
     font-size: 16px;
     font-weight: 700;
@@ -1022,6 +1028,76 @@ body {
     padding: 0 !important;
 }
 
+.charge-search-panel {
+    padding: 20px 16px 12px;
+    background: linear-gradient(180deg, #F4F8FD 0%, rgba(244, 248, 253, 0) 100%);
+}
+
+.charge-page-kicker {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--vf-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.charge-page-title {
+    margin-top: 6px;
+    font-size: 24px;
+    line-height: 1.2;
+    color: var(--vf-navy);
+}
+
+.charge-page-title span {
+    display: block;
+}
+
+.charge-page-subtitle {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.charge-search-box {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.charge-location-input {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font: inherit;
+    box-shadow: var(--shadow-sm);
+}
+
+.charge-location-input:focus {
+    outline: none;
+    border-color: var(--vf-blue);
+    box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.12);
+}
+
+.charge-search-btn {
+    border: none;
+    border-radius: 14px;
+    padding: 0 18px;
+    background: var(--vf-navy);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(0, 51, 102, 0.18);
+}
+
+.charge-search-btn:hover {
+    background: var(--vf-blue);
+}
+
 .charge-map-placeholder {
     height: 240px;
     background: linear-gradient(135deg, #E8F4FD 0%, #D0E8F7 100%);
@@ -1039,6 +1115,149 @@ body {
     background: 
         radial-gradient(circle at 30% 40%, rgba(0,102,204,0.08) 0%, transparent 50%),
         radial-gradient(circle at 70% 60%, rgba(0,51,102,0.06) 0%, transparent 50%);
+}
+
+.direction-map {
+    height: 336px;
+    padding: 20px;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.map-fake-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px);
+    background-size: 34px 34px;
+    opacity: 0.45;
+}
+
+.map-road {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 0 0 1px rgba(0, 51, 102, 0.04);
+    z-index: 0;
+}
+
+.road-a {
+    width: 170px;
+    height: 22px;
+    top: 92px;
+    left: -14px;
+    transform: rotate(22deg);
+    border-radius: 20px;
+}
+
+.road-b {
+    width: 210px;
+    height: 22px;
+    top: 160px;
+    right: -28px;
+    transform: rotate(-18deg);
+    border-radius: 20px;
+}
+
+.road-c {
+    width: 24px;
+    height: 170px;
+    top: 58px;
+    left: 182px;
+    border-radius: 20px;
+}
+
+.map-route-line {
+    position: absolute;
+    top: 112px;
+    left: 94px;
+    width: 168px;
+    height: 110px;
+    border: 6px solid #0B84FF;
+    border-left: 0;
+    border-bottom: 0;
+    border-radius: 0 70px 0 0;
+    transform: rotate(10deg);
+    z-index: 1;
+    filter: drop-shadow(0 6px 14px rgba(11, 132, 255, 0.22));
+}
+
+.map-marker {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 20px rgba(0, 51, 102, 0.24);
+    z-index: 2;
+}
+
+.map-marker-origin {
+    top: 118px;
+    left: 74px;
+    background: var(--vf-blue);
+}
+
+.map-marker-destination {
+    top: 188px;
+    right: 82px;
+    background: var(--success);
+}
+
+.map-route-pill {
+    align-self: stretch;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 12px 14px;
+    z-index: 1;
+    box-shadow: var(--shadow-sm);
+}
+
+.map-eta-badge {
+    position: absolute;
+    right: 20px;
+    top: 132px;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 14px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow-md);
+}
+
+.map-eta-badge span {
+    display: block;
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.map-eta-badge strong {
+    display: block;
+    margin-top: 2px;
+    font-size: 16px;
+    color: var(--vf-navy);
+}
+
+.map-route-pill span {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}
+
+.map-route-pill strong {
+    color: var(--vf-navy);
+    font-size: 14px;
 }
 
 .map-content {
@@ -1068,6 +1287,21 @@ body {
     padding: 16px;
 }
 
+.station-list-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.station-list-summary {
+    max-width: 150px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
 .station-card {
     display: flex;
     gap: 14px;
@@ -1078,6 +1312,10 @@ body {
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     transition: all 0.2s var(--ease-out);
+}
+
+.station-card + .station-card {
+    margin-top: 10px;
 }
 
 .station-card:hover {
@@ -1145,6 +1383,157 @@ body {
 
 .tag-distance {
     background: var(--bg-input);
+    color: var(--text-secondary);
+}
+
+.station-empty {
+    padding: 22px 18px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-sm);
+}
+
+.direction-card {
+    background: var(--bg-card);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: var(--shadow-md);
+}
+
+.direction-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--vf-blue);
+}
+
+.direction-title {
+    margin-top: 8px;
+    font-size: 22px;
+    color: var(--vf-navy);
+}
+
+.direction-address {
+    margin-top: 6px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.direction-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.direction-stat {
+    padding: 12px;
+    border-radius: 14px;
+    background: var(--bg-input);
+}
+
+.direction-stat span {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.direction-stat strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.direction-back-btn {
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px 18px;
+}
+
+.battery-check-card {
+    margin-top: 16px;
+    border-radius: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #F7FBFF 0%, #EDF5FF 100%);
+    border: 1px solid #D8E8FF;
+}
+
+.battery-check-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.battery-check-kicker {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--vf-blue);
+}
+
+.battery-check-head h4 {
+    margin-top: 4px;
+    font-size: 18px;
+    color: var(--vf-navy);
+}
+
+.battery-check-badge {
+    flex-shrink: 0;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.battery-check-badge.feasible {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.battery-check-badge.risky {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+.battery-check-badge.unreachable {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.battery-check-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.battery-check-item {
+    background: rgba(255, 255, 255, 0.82);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.battery-check-item span {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.battery-check-item strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+.battery-check-note {
+    margin-top: 12px;
+    font-size: 13px;
     color: var(--text-secondary);
 }
 

@@ -21,6 +21,7 @@ import uvicorn
 
 from mock.mock_llm import mock_react_response
 from tools import all_tools
+from tools.charging_station import get_nearest_charging_stations_data
 
 
 # ── FastAPI App ───────────────────────────────────────────────────────
@@ -45,6 +46,28 @@ if frontend_dir.exists():
     app.mount("/css", StaticFiles(directory=str(frontend_dir / "css")), name="css")
     app.mount("/js", StaticFiles(directory=str(frontend_dir / "js")), name="js")
     app.mount("/assets", StaticFiles(directory=str(frontend_dir / "assets")), name="assets")
+
+
+# ── Pydantic Models ──────────────────────────────────────────────────
+class ChatRequest(BaseModel):
+    message: str
+    session_id: str = "default"
+
+
+class ChatResponse(BaseModel):
+    answer: str
+    reasoning_steps: list[dict]
+    tool_used: str | None = None
+    tool_input: dict = {}
+
+
+class ToolInfo(BaseModel):
+    name: str
+    description: str
+
+
+class ChargingStationSearchRequest(BaseModel):
+    location: str = "VinUni"
 
 
 # ── API Endpoints ────────────────────────────────────────────────────
@@ -96,19 +119,26 @@ async def list_tools():
     ]
 
 
+@app.post("/api/charging-stations")
+async def search_charging_stations(request: ChargingStationSearchRequest):
+    """Tìm 3 trạm sạc gần nhất từ địa chỉ nhập bằng văn bản."""
+    return get_nearest_charging_stations_data(request.location)
+
+
 @app.get("/api/vehicle/status")
 async def vehicle_status():
     """Mock: Trạng thái xe hiện tại."""
     return {
         "model": "VinFast VF 8 Plus",
         "plate": "30A-123.45",
-        "battery_percent": 72,
-        "range_km": 245,
+        "battery_percent": 15,
+        "range_km": 42,
         "odometer_km": 15680,
         "next_service_km": 20000,
         "tire_pressure": {"fl": 2.3, "fr": 2.3, "rl": 2.4, "rr": 2.4},
         "warnings": [
             {"code": "W03", "message": "Sắp đến hạn bảo dưỡng", "severity": "low"},
+            {"code": "W15", "message": "Pin sắp hết, cần sạc sớm", "severity": "medium"},
         ],
     }
 

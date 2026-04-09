@@ -96,13 +96,23 @@
             <!-- Warnings -->
             <div class="warning-section fade-in-up" style="animation-delay: 0.1s">
                 <h3 class="section-title">⚠️ Cảnh báo</h3>
-                <div class="warning-card" id="warningCard" onclick="navigateToSupport('Xe báo cảnh báo W03 — sắp đến hạn bảo dưỡng')">
-                    <div class="warning-icon">🔧</div>
-                    <div class="warning-content">
-                        <p class="warning-title">Sắp đến hạn bảo dưỡng</p>
-                        <p class="warning-desc">Còn 4,320 km nữa — Mã: W03</p>
+                <div class="warning-list">
+                    <div class="warning-card" id="warningCard" onclick="navigateToSupport('Xe báo cảnh báo W03 — sắp đến hạn bảo dưỡng')">
+                        <div class="warning-icon">🔧</div>
+                        <div class="warning-content">
+                            <p class="warning-title">Sắp đến hạn bảo dưỡng</p>
+                            <p class="warning-desc">Còn 4,320 km nữa — Mã: W03</p>
+                        </div>
+                        <span class="warning-arrow">›</span>
                     </div>
-                    <span class="warning-arrow">›</span>
+                    <div class="warning-card" id="batteryWarningCard" onclick="openChargingStations('VinUni')">
+                        <div class="warning-icon">🔋</div>
+                        <div class="warning-content">
+                            <p class="warning-title">Sắp hết pin</p>
+                            <p class="warning-desc">Pin còn 15% — Mã: W15</p>
+                        </div>
+                        <span class="warning-arrow">›</span>
+                    </div>
                 </div>
             </div>
 
@@ -190,65 +200,101 @@
 
         <!-- ══ PAGE: SẠC ════════════════════════════════════════ -->
         <div class="page charge-page" id="page-charge">
-            <!-- Map placeholder -->
-            <div class="charge-map-placeholder">
-                <div class="map-content">
-                    <div class="map-icon">📍</div>
-                    <p class="map-text">Bản đồ trạm sạc</p>
-                    <p class="map-subtext">Hiển thị trạm sạc VinFast gần bạn</p>
+            <div class="charge-search-panel">
+                <p class="charge-page-kicker">Tìm trạm sạc gần nhất</p>
+                <h2 class="charge-page-title">Bạn đang ở <span id="chargeResolvedLocation">VinUniversity, Vinhomes Ocean Park, Gia Lâm, Hà Nội</span></h2>
+                <p class="charge-page-subtitle">Nhập địa chỉ bằng văn bản để tìm 3 trạm sạc VinFast gần bạn.</p>
+
+                <div class="charge-search-box">
+                    <input type="text" id="chargeLocationInput" class="charge-location-input" value="VinUni" placeholder="Ví dụ: VinUni, Ocean Park, Gia Lâm">
+                    <button class="charge-search-btn" id="chargeSearchBtn">Tìm trạm</button>
                 </div>
             </div>
 
-            <!-- Station list -->
             <div class="station-list">
-                <h3 class="section-title">Trạm sạc gần nhất</h3>
-
-                <div class="station-card" id="station1">
-                    <div class="station-icon">⚡</div>
-                    <div class="station-info">
-                        <p class="station-name">VinFast Charging — Vincom Bà Triệu</p>
-                        <p class="station-address">191 Bà Triệu, Hai Bà Trưng, Hà Nội</p>
-                        <div class="station-meta">
-                            <span class="station-tag tag-available">🟢 3/5 trống</span>
-                            <span class="station-tag tag-distance">📍 1.2 km</span>
-                        </div>
-                    </div>
+                <div class="station-list-header">
+                    <h3 class="section-title">Trạm sạc gần bạn</h3>
+                    <p class="station-list-summary" id="stationListSummary">Đang tải danh sách trạm sạc...</p>
                 </div>
+                <div id="stationResults"></div>
+            </div>
+        </div>
 
-                <div class="station-card" id="station2">
-                    <div class="station-icon">⚡</div>
-                    <div class="station-info">
-                        <p class="station-name">VinFast Charging — Times City</p>
-                        <p class="station-address">458 Minh Khai, Hai Bà Trưng, Hà Nội</p>
-                        <div class="station-meta">
-                            <span class="station-tag tag-available">🟢 2/4 trống</span>
-                            <span class="station-tag tag-distance">📍 2.8 km</span>
-                        </div>
-                    </div>
+        <div class="page charge-page" id="page-charge-map">
+            <div class="charge-map-placeholder direction-map">
+                <div class="map-fake-grid"></div>
+                <div class="map-road road-a"></div>
+                <div class="map-road road-b"></div>
+                <div class="map-road road-c"></div>
+                <div class="map-route-line"></div>
+                <div class="map-marker map-marker-origin">A</div>
+                <div class="map-marker map-marker-destination">B</div>
+                <div class="map-route-pill">
+                    <span>Điểm đi</span>
+                    <strong id="routeOrigin">VinUniversity, Vinhomes Ocean Park, Gia Lâm, Hà Nội</strong>
                 </div>
-
-                <div class="station-card" id="station3">
-                    <div class="station-icon">⚡</div>
-                    <div class="station-info">
-                        <p class="station-name">VinFast Charging — Royal City</p>
-                        <p class="station-address">72A Nguyễn Trãi, Thanh Xuân, Hà Nội</p>
-                        <div class="station-meta">
-                            <span class="station-tag tag-available">🟡 1/6 trống</span>
-                            <span class="station-tag tag-distance">📍 4.1 km</span>
-                        </div>
-                    </div>
+                <div class="map-content">
+                    <div class="map-icon">🗺️</div>
+                    <p class="map-text">Bản đồ chỉ đường</p>
+                    <p class="map-subtext">Lộ trình mock từ vị trí hiện tại tới trạm sạc đã chọn</p>
                 </div>
+                <div class="map-route-pill map-route-destination">
+                    <span>Điểm đến</span>
+                    <strong id="routeDestination">VinFast Charging</strong>
+                </div>
+                <div class="map-eta-badge">
+                    <span>ETA</span>
+                    <strong id="routeEta">18 phút</strong>
+                </div>
+            </div>
 
-                <div class="station-card" id="station4">
-                    <div class="station-icon full">⚡</div>
-                    <div class="station-info">
-                        <p class="station-name">VinFast Charging — Aeon Mall Long Biên</p>
-                        <p class="station-address">27 Cổ Linh, Long Biên, Hà Nội</p>
-                        <div class="station-meta">
-                            <span class="station-tag tag-full">🔴 Đầy</span>
-                            <span class="station-tag tag-distance">📍 7.2 km</span>
+            <div class="station-list">
+                <div class="direction-card">
+                    <p class="direction-label">Trạm sạc được chọn</p>
+                    <h3 class="direction-title" id="directionStationName">VinFast Charging</h3>
+                    <p class="direction-address" id="directionStationAddress">Địa chỉ trạm sạc</p>
+
+                    <div class="direction-stats">
+                        <div class="direction-stat">
+                            <span>Khoảng cách</span>
+                            <strong id="directionDistance">0 km</strong>
+                        </div>
+                        <div class="direction-stat">
+                            <span>Loại sạc</span>
+                            <strong id="directionType">DC 60kW</strong>
+                        </div>
+                        <div class="direction-stat">
+                            <span>Thời gian</span>
+                            <strong id="directionTime">~25 phút</strong>
                         </div>
                     </div>
+
+                    <div class="battery-check-card" id="batteryCheckCard">
+                        <div class="battery-check-head">
+                            <div>
+                                <p class="battery-check-kicker">Khả năng di chuyển</p>
+                                <h4 id="batteryCheckTitle">Đủ pin để đến trạm</h4>
+                            </div>
+                            <span class="battery-check-badge feasible" id="batteryCheckBadge">Khả thi</span>
+                        </div>
+                        <div class="battery-check-grid">
+                            <div class="battery-check-item">
+                                <span>Pin hiện tại</span>
+                                <strong id="batteryCurrent">15%</strong>
+                            </div>
+                            <div class="battery-check-item">
+                                <span>Pin cần thiết</span>
+                                <strong id="batteryNeeded">4%</strong>
+                            </div>
+                            <div class="battery-check-item">
+                                <span>Dự phòng còn lại</span>
+                                <strong id="batteryRemaining">11%</strong>
+                            </div>
+                        </div>
+                        <p class="battery-check-note" id="batteryCheckNote">Bạn có thể tới trạm và vẫn còn mức pin an toàn.</p>
+                    </div>
+
+                    <button class="charge-search-btn direction-back-btn" onclick="switchTab('charge')">Quay lại danh sách</button>
                 </div>
             </div>
         </div>
