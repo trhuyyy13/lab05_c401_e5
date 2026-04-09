@@ -23,12 +23,41 @@ Khi có API key: uncomment phần LangGraph integration.
 
 from __future__ import annotations
 from typing import Literal
+import json
+import logging
+import os
+from pathlib import Path
 
 from langgraph.graph import StateGraph, END
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from langchain_core.messages import AIMessage, SystemMessage, ToolMessage
+from langchain_openai import ChatOpenAI
 
 from .state import AgentState
 from .prompts import SYSTEM_PROMPT
+from tools import all_tools
+
+
+LOG_DIR = Path(__file__).parent.parent / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_FILE = LOG_DIR / "tool_calls.log"
+
+logger = logging.getLogger("neo.tools")
+if not logger.handlers:
+    logger.setLevel(logging.INFO)
+    file_handler = logging.FileHandler(LOG_FILE, encoding="utf-8")
+    stream_handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+    file_handler.setFormatter(formatter)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+
+
+def _get_llm() -> ChatOpenAI:
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENAI_API_KEY is not set")
+    return ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=api_key)
 
 
 def should_continue(state: AgentState) -> Literal["act", "respond"]:
@@ -49,20 +78,13 @@ def reason_node(state: AgentState) -> dict:
     Trong production: gọi LLM thật (ChatOpenAI, ChatAnthropic, etc.)
     Trong mock mode: node này không được dùng (bypass qua mock_llm)
     """
-    # ── Production code (uncomment khi có API key) ──
-    # from langchain_openai import ChatOpenAI
-    # from tools import all_tools
-    # 
-    # llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-    # llm_with_tools = llm.bind_tools(all_tools)
-    # 
-    # messages = [SystemMessage(content=SYSTEM_PROMPT)] + list(state["messages"])
-    # response = llm_with_tools.invoke(messages)
-    # 
-    # return {"messages": [response]}
-    
-    # ── Mock mode ──
-    return {"messages": [AIMessage(content="Mock reasoning — use mock_llm.py for demo")]}
+    llm = _get_llm()
+    llm_with_tools = llm.bind_tools(all_tools)
+
+    messages = [SystemMessage(content=SYSTEM_PROMPT)] + list(state["messages"])
+    response = llm_with_tools.invoke(messages)
+
+    return {"messages": [response]}
 
 
 def act_node(state: AgentState) -> dict:
@@ -71,20 +93,38 @@ def act_node(state: AgentState) -> dict:
     
     Trong production: tự động gọi tool từ tool_calls.
     """
-    # ── Production code (uncomment khi có API key) ──
-    # from langchain_core.messages import ToolMessage
-    # from tools import all_tools
-    #
-    # tool_map = {t.name: t for t in all_tools}
-    # last_message = state["messages"][-1]
-    # results = []
-    # for tc in last_message.tool_calls:
-    #     tool = tool_map[tc["name"]]
-    #     result = tool.invoke(tc["args"])
-    #     results.append(ToolMessage(content=str(result), tool_call_id=tc["id"]))
-    # return {"messages": results}
-    
-    return {"messages": []}
+    tool_map = {t.name: t for t in all_tools}
+    last_message = state["messages"][-1]
+    results = []
+    steps = list(state.get("reasoning_steps", []))
+
+    for tc in last_message.tool_calls:
+        tool_name = tc.get("name")
+        tool_args = tc.get("args", {})
+        tool = tool_map.get(tool_name)
+
+        if tool is None:
+            tool_result = f"Tool not found: {tool_name}"
+        else:
+            try:
+                tool_result = tool.invoke(tool_args)
+            except Exception as exc:
+                tool_result = f"Tool error: {exc}"
+
+        results.append(ToolMessage(content=str(tool_result), tool_call_id=tc.get("id")))
+
+        args_json = json.dumps(tool_args, ensure_ascii=True)
+        result_text = str(tool_result)
+        if len(result_text) > 500:
+            result_text = result_text[:500] + "..."
+
+        logger.info("tool_call name=%s args=%s result=%s", tool_name, args_json, result_text)
+        steps.append({
+            "step": "tool",
+            "content": f"{tool_name}({args_json})",
+        })
+
+    return {"messages": results, "reasoning_steps": steps}
 
 
 def respond_node(state: AgentState) -> dict:

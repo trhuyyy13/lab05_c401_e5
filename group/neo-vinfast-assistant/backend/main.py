@@ -7,12 +7,14 @@ Hoặc: uvicorn main:app --reload --port 8000
 """
 
 from __future__ import annotations
+import os
 import sys
 from pathlib import Path
 
 # Thêm backend/ vào path
 sys.path.insert(0, str(Path(__file__).parent))
 
+import logging
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
@@ -20,9 +22,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 
-from mock.mock_llm import mock_react_response
+from agent.graph import build_graph
 from tools import all_tools
 from tools.charging_station import get_nearest_charging_stations_data
+from langchain_core.messages import HumanMessage
 
 
 # ── FastAPI App ───────────────────────────────────────────────────────
@@ -31,6 +34,14 @@ app = FastAPI(
     description="Multi-agent framework hỗ trợ người dùng xe VinFast",
     version="1.0.0",
 )
+
+logger = logging.getLogger("neo.agent")
+if not logger.handlers:
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
 # CORS — cho phép frontend gọi API
 app.add_middleware(
@@ -88,7 +99,7 @@ async def health_check():
         "status": "healthy",
         "service": "NEO — VinFast AI Assistant",
         "version": "1.0.0",
-        "mode": "mock",
+        "mode": "openai",
         "tools_loaded": len(all_tools),
     }
 
@@ -102,13 +113,45 @@ async def chat(request: ChatRequest):
     1. Import build_graph từ agent.graph
     2. Thay mock_react_response bằng graph.invoke()
     """
-    result = mock_react_response(request.message)
-    
+    if not os.getenv("OPENAI_API_KEY"):
+        return ChatResponse(
+            answer="Chua thiet lap OPENAI_API_KEY. Vui long cau hinh de su dung chatbot.",
+            reasoning_steps=[],
+            tool_used=None,
+            tool_input={},
+        )
+
+    graph = build_graph()
+    result = graph.invoke({
+        "messages": [HumanMessage(content=request.message)],
+        "reasoning_steps": [],
+    })
+
+    messages = result.get("messages", [])
+    answer = ""
+    for message in reversed(messages):
+        if getattr(message, "content", None):
+            answer = message.content
+            break
+
+    reasoning_steps = result.get("reasoning_steps", [])
+    if reasoning_steps:
+        for step in reasoning_steps:
+            if isinstance(step, dict):
+                logger.info("reasoning step=%s content=%s", step.get("step"), step.get("content"))
+    tool_used = None
+    tool_input = {}
+    if reasoning_steps:
+        last_step = reasoning_steps[-1]
+        if isinstance(last_step, dict) and last_step.get("step") == "tool":
+            tool_used = "tool"
+            tool_input = {"detail": last_step.get("content", "")}
+
     return ChatResponse(
-        answer=result["answer"],
-        reasoning_steps=result["reasoning_steps"],
-        tool_used=result.get("tool_used"),
-        tool_input=result.get("tool_input", {}),
+        answer=answer or "Xin loi, hien tai toi chua co phan hoi.",
+        reasoning_steps=reasoning_steps,
+        tool_used=tool_used,
+        tool_input=tool_input,
     )
 
 
