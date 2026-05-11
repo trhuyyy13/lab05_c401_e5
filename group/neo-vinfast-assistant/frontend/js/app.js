@@ -901,4 +901,30 @@ document.addEventListener('DOMContentLoaded', () => {
             ring.style.strokeDashoffset = finalOffset;
         }, 300);
     }
+
+    // ── Theme Toggle ─────────────────────────────────────────────────
+    const themeToggle = document.getElementById('themeToggle');
+    const iconSun  = themeToggle?.querySelector('.icon-sun');
+    const iconMoon = themeToggle?.querySelector('.icon-moon');
+
+    function applyTheme(dark) {
+        if (dark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            if (iconSun)  iconSun.style.display  = '';
+            if (iconMoon) iconMoon.style.display = 'none';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            if (iconSun)  iconSun.style.display  = 'none';
+            if (iconMoon) iconMoon.style.display = '';
+        }
+    }
+
+    const savedTheme = localStorage.getItem('neo-theme');
+    applyTheme(savedTheme === 'dark');
+
+    themeToggle?.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        applyTheme(!isDark);
+        localStorage.setItem('neo-theme', isDark ? 'light' : 'dark');
+    });
 });

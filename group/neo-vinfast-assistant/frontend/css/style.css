@@ -15,8 +15,9 @@
     --vf-blue:        #0066CC;
     --vf-blue-light:  #3399FF;
     --vf-sky:         #E8F4FD;
-    
+
     /* Neutrals */
+    --page-bg:        #E8ECF4;
     --bg-primary:     #F5F6FA;
     --bg-card:        #FFFFFF;
     --bg-input:       #F0F2F5;
@@ -25,7 +26,7 @@
     --text-muted:     #9CA3AF;
     --border:         #E5E7EB;
     --border-light:   #F3F4F6;
-    
+
     /* Status Colors */
     --success:        #10B981;
     --success-bg:     #D1FAE5;
@@ -35,22 +36,45 @@
     --danger-bg:      #FEE2E2;
     --info:           #3B82F6;
     --info-bg:        #DBEAFE;
-    
+
     /* Shadows */
     --shadow-sm:      0 1px 2px rgba(0,0,0,0.05);
     --shadow-md:      0 4px 12px rgba(0,0,0,0.08);
     --shadow-lg:      0 8px 30px rgba(0,0,0,0.12);
     --shadow-xl:      0 20px 60px rgba(0,0,0,0.15);
     --shadow-nav:     0 -4px 20px rgba(0,0,0,0.08);
-    
+
     /* Spacing */
     --nav-height:     64px;
     --header-height:  56px;
     --safe-bottom:    20px;
-    
+
     /* Transitions */
     --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
     --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Dark Mode ────────────────────────────────────────────────────── */
+html[data-theme="dark"] {
+    --vf-sky:         #0F2744;
+    --page-bg:        #0A0C12;
+    --bg-primary:     #111318;
+    --bg-card:        #1C1F2E;
+    --bg-input:       #252836;
+    --text-primary:   #E8ECF4;
+    --text-secondary: #9CA3AF;
+    --text-muted:     #6B7280;
+    --border:         #2D3348;
+    --border-light:   #1E2130;
+    --success-bg:     #064E3B;
+    --warning-bg:     #78350F;
+    --danger-bg:      #7F1D1D;
+    --info-bg:        #1E3A5F;
+    --shadow-sm:      0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md:      0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg:      0 8px 30px rgba(0,0,0,0.5);
+    --shadow-xl:      0 20px 60px rgba(0,0,0,0.6);
+    --shadow-nav:     0 -4px 20px rgba(0,0,0,0.4);
 }
 
 /* ── Reset & Base ─────────────────────────────────────────────────── */
@@ -67,7 +91,8 @@ html {
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #E8ECF4;
+    background: var(--page-bg);
+    transition: background 0.3s ease;
     color: var(--text-primary);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -194,6 +219,46 @@ body {
     font-weight: 800;
     color: var(--vf-navy);
     letter-spacing: -0.5px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-toggle {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg-input);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-out);
+    color: var(--vf-navy);
+    flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+    background: var(--vf-sky);
+    transform: scale(1.05);
+}
+
+html[data-theme="dark"] .theme-toggle {
+    color: #F59E0B;
+}
+
+.theme-toggle svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.4s var(--ease-spring);
+}
+
+.theme-toggle:active svg {
+    transform: rotate(30deg) scale(0.9);
 }
 
 /* ── Page Container ───────────────────────────────────────────────── */
@@ -2571,6 +2636,189 @@ body {
         transform: translateY(-10px);
     }
 }
+
+/* ── Dark Mode Overrides (visual-refresh section) ─────────────────── */
+html[data-theme="dark"] body {
+    background:
+        radial-gradient(circle at 20% 12%, rgba(0, 100, 180, 0.18), transparent 28%),
+        radial-gradient(circle at 86% 78%, rgba(0, 184, 169, 0.1), transparent 30%),
+        linear-gradient(135deg, #0A0C12 0%, #0F1117 52%, #0A0E18 100%);
+}
+
+html[data-theme="dark"] .phone-frame {
+    background: var(--bg-primary);
+    box-shadow:
+        var(--shadow-xl),
+        inset 0 0 0 1px rgba(255,255,255,0.04),
+        0 0 0 8px #141621,
+        0 0 0 10px #0A0C12;
+}
+
+html[data-theme="dark"] .status-bar,
+html[data-theme="dark"] .app-header,
+html[data-theme="dark"] .bottom-nav {
+    background: rgba(28, 31, 46, 0.92);
+    backdrop-filter: blur(18px);
+}
+
+html[data-theme="dark"] .app-header {
+    border-bottom-color: rgba(45, 51, 72, 0.8);
+}
+
+html[data-theme="dark"] .bottom-nav {
+    border-top-color: rgba(45, 51, 72, 0.7);
+}
+
+html[data-theme="dark"] .header-logo {
+    color: white;
+    background: linear-gradient(135deg, var(--vf-navy-light), var(--vf-blue));
+    box-shadow: 0 8px 18px rgba(0, 102, 204, 0.3);
+}
+
+html[data-theme="dark"] .btn.secondary,
+html[data-theme="dark"] .btn.ghost {
+    background: rgba(37, 40, 54, 0.9);
+    border: 1px solid rgba(45, 51, 72, 0.9);
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .nav-item.active:not(.nav-center) {
+    background: linear-gradient(180deg, rgba(15, 39, 68, 0.9), rgba(28, 31, 46, 0.3));
+}
+
+html[data-theme="dark"] .vehicle-card {
+    background:
+        linear-gradient(180deg, rgba(37,40,54,0.97), rgba(28,31,46,0.92)),
+        linear-gradient(135deg, rgba(0,102,204,0.12), rgba(0,184,169,0.08));
+    border-color: rgba(45, 51, 72, 0.6);
+}
+
+html[data-theme="dark"] .vehicle-card,
+html[data-theme="dark"] .flow-section,
+html[data-theme="dark"] .booking-card,
+html[data-theme="dark"] .profile-menu-group,
+html[data-theme="dark"] .station-card,
+html[data-theme="dark"] .option-card,
+html[data-theme="dark"] .flow-card,
+html[data-theme="dark"] .garage-card,
+html[data-theme="dark"] .success-card {
+    border-color: rgba(45, 51, 72, 0.6);
+}
+
+html[data-theme="dark"] .battery-section {
+    background: linear-gradient(135deg, rgba(15,39,68,0.9), rgba(6,78,59,0.4));
+}
+
+html[data-theme="dark"] .battery-ring-bg {
+    stroke: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .stat-item,
+html[data-theme="dark"] .assessment-card,
+html[data-theme="dark"] .doc-item,
+html[data-theme="dark"] .checkbox-item,
+html[data-theme="dark"] .station-empty {
+    background: rgba(37, 40, 54, 0.7);
+    border-color: rgba(45, 51, 72, 0.7);
+}
+
+html[data-theme="dark"] .warning-card {
+    background:
+        linear-gradient(90deg, rgba(37,40,54,0.98), rgba(28,31,46,0.95)),
+        linear-gradient(135deg, rgba(120,53,15,0.2), rgba(127,29,29,0.15));
+}
+
+html[data-theme="dark"] .warning-icon {
+    background: linear-gradient(135deg, rgba(120,53,15,0.5), rgba(251,191,36,0.2));
+}
+
+html[data-theme="dark"] .action-btn {
+    background: rgba(37, 40, 54, 0.88);
+    border-color: rgba(45, 51, 72, 0.7);
+}
+
+html[data-theme="dark"] .chat-page {
+    background:
+        linear-gradient(180deg, rgba(15,39,68,0.4), rgba(17,19,24,0.98));
+}
+
+html[data-theme="dark"] .message.bot .msg-bubble {
+    background: rgba(37, 40, 54, 0.95);
+    border-color: rgba(45, 51, 72, 0.7);
+}
+
+html[data-theme="dark"] .chat-input-area {
+    background: rgba(28, 31, 46, 0.92);
+    backdrop-filter: blur(18px);
+}
+
+html[data-theme="dark"] .chat-input-wrap {
+    background: rgba(37, 40, 54, 0.9);
+}
+
+html[data-theme="dark"] .suggestion-chip {
+    background: rgba(37, 40, 54, 0.9);
+    border-color: rgba(45, 51, 72, 0.7);
+}
+
+html[data-theme="dark"] .charge-map-placeholder {
+    background:
+        radial-gradient(circle at 18% 22%, rgba(37,40,54,0.9) 0%, rgba(37,40,54,0.3) 17%, transparent 18%),
+        radial-gradient(circle at 78% 16%, rgba(0,184,169,0.12) 0%, transparent 26%),
+        linear-gradient(135deg, #0F1117 0%, #111825 48%, #0F1A18 100%);
+}
+
+html[data-theme="dark"] .map-overlay-card {
+    background: rgba(28, 31, 46, 0.9);
+    border-color: rgba(45, 51, 72, 0.7);
+}
+
+html[data-theme="dark"] .station-list {
+    background: linear-gradient(180deg, rgba(17,19,24,0.5), rgba(17,19,24,1));
+}
+
+html[data-theme="dark"] .station-icon {
+    background: linear-gradient(135deg, rgba(0,184,169,0.2), rgba(0,184,169,0.1));
+}
+
+html[data-theme="dark"] .station-icon.full {
+    background: linear-gradient(135deg, rgba(127,29,29,0.4), rgba(239,68,68,0.2));
+}
+
+html[data-theme="dark"] .flow-page {
+    background:
+        radial-gradient(circle at 90% 4%, rgba(0,102,204,0.15), transparent 30%),
+        var(--bg-primary);
+}
+
+html[data-theme="dark"] .flow-section,
+html[data-theme="dark"] .flow-card,
+html[data-theme="dark"] .option-card,
+html[data-theme="dark"] .garage-card,
+html[data-theme="dark"] .success-card {
+    background: rgba(37, 40, 54, 0.9);
+}
+
+html[data-theme="dark"] .form-input {
+    background: rgba(37, 40, 54, 0.85);
+    border-color: rgba(45, 51, 72, 0.9);
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .form-input:focus {
+    border-color: var(--vf-blue-light);
+    box-shadow: 0 0 0 4px rgba(51, 153, 255, 0.14);
+}
+
+html[data-theme="dark"] .profile-menu-item {
+    background: rgba(37, 40, 54, 0.5);
+}
+
+html[data-theme="dark"] .menu-icon.blue   { background: linear-gradient(135deg, #1E3A5F, #1a4d80); }
+html[data-theme="dark"] .menu-icon.green  { background: linear-gradient(135deg, #064E3B, #065F46); }
+html[data-theme="dark"] .menu-icon.orange { background: linear-gradient(135deg, #78350F, #92400E); }
+html[data-theme="dark"] .menu-icon.red    { background: linear-gradient(135deg, #7F1D1D, #991B1B); }
+html[data-theme="dark"] .menu-icon.purple { background: linear-gradient(135deg, #3B0764, #1E3A5F); }
 
 /* Responsive — fullscreen on small screens */
 @media (max-width: 420px) {
